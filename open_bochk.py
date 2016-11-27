@@ -58,6 +58,13 @@ def read_cash_bochk(filename, port_values):
 	wb = open_workbook(filename=filename)
 	ws = wb.sheet_by_index(0)
 	row = 0
+	
+	cell_value = ws.cell_value(row, 0)
+	while row < ws.nrows:
+		if isinstance(cell_value, str) and cell_value.strip() == 'Account Name':
+			break
+		row = row + 1
+
 
 	logger.debug('out of read_cash_bochk()')
 
