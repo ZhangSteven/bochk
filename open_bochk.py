@@ -31,31 +31,43 @@ class InconsistentPositionGrandTotal(Exception):
 
 
 
-def read_bochk(filename, port_values):
+def read_holdings_bochk(filename, port_values):
 
-	logger.debug('in read_bochk()')
+	logger.debug('in read_holdings_bochk()')
 
 	wb = open_workbook(filename=filename)
 	ws = wb.sheet_by_index(0)
 	row = 0
 
-	while not field_begins(ws, row):
+	while not holdings_field_begins(ws, row):
 		row = row + 1
 
-	fields = read_fields(ws, row)
+	fields = read_holdings_fields(ws, row)
 
 	grand_total = read_holdings(ws, row+1, port_values, fields)
 	validate_all_holdings(port_values['holdings'], grand_total)
 
-	logger.debug('out of read_bochk()')
+	logger.debug('out of read_holdings_bochk()')
 
 
 
-def field_begins(ws, row):
+def read_cash_bochk(filename, port_values):
+
+	logger.debug('in read_cash_bochk()')
+
+	wb = open_workbook(filename=filename)
+	ws = wb.sheet_by_index(0)
+	row = 0
+
+	logger.debug('out of read_cash_bochk()')
+
+
+
+def holdings_field_begins(ws, row):
 	"""
 	Detect whether it has reached the data header row.
 	"""
-	logger.debug('in field_begins()')
+	logger.debug('in holdings_field_begins()')
 	
 	cell_value = ws.cell_value(row, 0)
 	if isinstance(cell_value, str) and cell_value.strip() == 'Record Type':
@@ -65,12 +77,12 @@ def field_begins(ws, row):
 
 
 
-def read_fields(ws, row):
+def read_holdings_fields(ws, row):
 	"""
 	ws: the worksheet
 	row: the row number to read
 
-	fields = read_fields(ws, row)
+	fields = read_holdings_fields(ws, row)
 
 	fields: the list of data fields
 	"""
@@ -104,7 +116,7 @@ def read_fields(ws, row):
 		if isinstance(cell_value, str) and cell_value.strip() in d:
 			fields.append(d[cell_value.strip()])
 		else:
-			logger.error('read_fields(): invalid column name {0} at row {1}, column {2}'.
+			logger.error('read_holdings_fields(): invalid column name {0} at row {1}, column {2}'.
 							format(cell_value, row, column))
 			raise InvalidFieldName()
 

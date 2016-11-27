@@ -6,11 +6,11 @@ import unittest2
 from datetime import datetime
 from xlrd import open_workbook
 from bochk.utility import get_current_path
-from bochk.open_bochk import field_begins, read_fields, initialize_position, \
+from bochk.open_bochk import holdings_field_begins, read_holdings_fields, initialize_position, \
                                 read_position_holding_detail, read_position_sub_total, \
                                 read_position_available_balance, read_position, \
                                 validate_position, is_grand_total, read_grand_total, \
-                                read_holdings, read_bochk
+                                read_holdings, read_holdings_bochk
 
 
 
@@ -43,25 +43,25 @@ class TestBOCHK(unittest2.TestCase):
 
 
 
-    def test_field_begins(self):
+    def test_holdings_field_begins(self):
         ws = self.get_worksheet('\\samples\\sample_holdings2.xls')
         row = 0
-        self.assertFalse(field_begins(ws, row))
+        self.assertFalse(holdings_field_begins(ws, row))
         row = 2
-        self.assertTrue(field_begins(ws, row))
+        self.assertTrue(holdings_field_begins(ws, row))
 
 
-    def test_read_fields(self):
+    def test_read_holdings_fields(self):
         """
         Read the date
         """
         ws = self.get_worksheet('\\samples\\sample_holdings2.xls')
         row = 0
 
-        while not field_begins(ws, row):
+        while not holdings_field_begins(ws, row):
             row = row + 1
 
-        fields = read_fields(ws, row)
+        fields = read_holdings_fields(ws, row)
         self.assertEqual(len(fields), 20)
         self.assertEqual(fields[0], 'generation_date')
         self.assertEqual(fields[10], 'holding_quantity')
@@ -71,7 +71,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def test_read_position_holding_detail(self):
         ws = self.get_worksheet('\\samples\\sample_holdings2.xls')
-        fields = read_fields(ws, 2)
+        fields = read_holdings_fields(ws, 2)
 
         position = {}
         initialize_position(position)
@@ -88,7 +88,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def test_read_position_holding_detail2(self):
         ws = self.get_worksheet('\\samples\\sample_holdings3.xls')
-        fields = read_fields(ws, 2)
+        fields = read_holdings_fields(ws, 2)
 
         position = {}
         initialize_position(position)
@@ -107,7 +107,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def test_read_position_sub_total(self):
         ws = self.get_worksheet('\\samples\\sample_holdings2.xls')
-        fields = read_fields(ws, 2)
+        fields = read_holdings_fields(ws, 2)
 
         # read a normal position
         position = {}
@@ -124,7 +124,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def test_read_position_sub_total2(self):
         ws = self.get_worksheet('\\samples\\sample_holdings4.xls')
-        fields = read_fields(ws, 2)
+        fields = read_holdings_fields(ws, 2)
 
         # read an All section position
         position = {}
@@ -141,7 +141,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def test_read_position_available_balance(self):
         ws = self.get_worksheet('\\samples\\sample_holdings3.xls')
-        fields = read_fields(ws, 2)
+        fields = read_holdings_fields(ws, 2)
 
         position = {}
         read_position_available_balance(ws, 11, fields, position)
@@ -151,7 +151,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def test_read_position(self):
         ws = self.get_worksheet('\\samples\\sample_holdings3.xls')
-        fields = read_fields(ws, 2)
+        fields = read_holdings_fields(ws, 2)
 
         position = {}
         row = read_position(ws, 3, fields, position)
@@ -167,7 +167,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def test_validate_position(self):
         ws = self.get_worksheet('\\samples\\sample_holdings3.xls')
-        fields = read_fields(ws, 2)
+        fields = read_holdings_fields(ws, 2)
 
         position = {}
         row = read_position(ws, 3, fields, position)
@@ -187,7 +187,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def test_grand_total(self):
         ws = self.get_worksheet('\\samples\\sample_holdings1.xls')
-        fields = read_fields(ws, 2)
+        fields = read_holdings_fields(ws, 2)
 
         self.assertTrue(is_grand_total(ws, 93))
         try:
@@ -200,7 +200,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def test_read_holdings(self):
         ws = self.get_worksheet('\\samples\\sample_holdings2.xls')
-        fields = read_fields(ws, 2)
+        fields = read_holdings_fields(ws, 2)
         port_values = {}
         try:
             x = read_holdings(ws, 3, port_values, fields)
@@ -213,7 +213,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def test_read_holdings2(self):
         ws = self.get_worksheet('\\samples\\sample_holdings4.xls')
-        fields = read_fields(ws, 2)
+        fields = read_holdings_fields(ws, 2)
         port_values = {}
         try:
             x = read_holdings(ws, 3, port_values, fields)
@@ -224,18 +224,18 @@ class TestBOCHK(unittest2.TestCase):
 
 
 
-    def test_read_bochk(self):
+    def test_read_holdings_bochk(self):
         filename = get_current_path() + '\\samples\\sample_holdings2.xls'
         port_values = {}
-        read_bochk(filename, port_values)
+        read_holdings_bochk(filename, port_values)
         self.verify_holdings(port_values['holdings'])
 
 
 
-    def test_read_bochk2(self):
+    def test_read_holdings_bochk2(self):
         filename = get_current_path() + '\\samples\\sample_holdings4.xls'
         port_values = {}
-        read_bochk(filename, port_values)
+        read_holdings_bochk(filename, port_values)
         self.verify_holdings2(port_values['holdings'])
 
 

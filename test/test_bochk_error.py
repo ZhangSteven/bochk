@@ -6,7 +6,7 @@ import unittest2
 from datetime import datetime
 from xlrd import open_workbook
 from bochk.utility import get_current_path
-from bochk.open_bochk import read_bochk, InvalidFieldName, InvalidHoldingType, \
+from bochk.open_bochk import read_holdings_bochk, InvalidFieldName, InvalidHoldingType, \
                                 InconsistentPosition, InconsistentPositionFieldsTotal, \
                                 InconsistentPositionGrandTotal
 
@@ -36,7 +36,7 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error.xls'
         port_values = {}
         with self.assertRaises(InvalidFieldName):
-            read_bochk(filename, port_values)
+            read_holdings_bochk(filename, port_values)
 
 
 
@@ -44,7 +44,7 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error2.xls'
         port_values = {}
         with self.assertRaises(TypeError):
-            read_bochk(filename, port_values)
+            read_holdings_bochk(filename, port_values)
 
 
 
@@ -52,7 +52,7 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error3.xls'
         port_values = {}
         with self.assertRaises(InvalidHoldingType):
-            read_bochk(filename, port_values)
+            read_holdings_bochk(filename, port_values)
 
 
 
@@ -60,7 +60,7 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error4.xls'
         port_values = {}
         with self.assertRaises(TypeError):
-            read_bochk(filename, port_values)
+            read_holdings_bochk(filename, port_values)
 
 
 
@@ -68,7 +68,7 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error5.xls'
         port_values = {}
         with self.assertRaises(TypeError):
-            read_bochk(filename, port_values)
+            read_holdings_bochk(filename, port_values)
 
 
 
@@ -76,7 +76,7 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error6.xls'
         port_values = {}
         with self.assertRaises(TypeError):
-            read_bochk(filename, port_values)
+            read_holdings_bochk(filename, port_values)
 
 
 
@@ -84,7 +84,7 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error7.xls'
         port_values = {}
         with self.assertRaises(InconsistentPosition):
-            read_bochk(filename, port_values)
+            read_holdings_bochk(filename, port_values)
 
 
 
@@ -92,7 +92,7 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error8.xls'
         port_values = {}
         with self.assertRaises(InconsistentPosition):
-            read_bochk(filename, port_values)
+            read_holdings_bochk(filename, port_values)
 
 
 
@@ -100,7 +100,7 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error9.xls'
         port_values = {}
         with self.assertRaises(InconsistentPositionFieldsTotal):
-            read_bochk(filename, port_values)
+            read_holdings_bochk(filename, port_values)
 
 
 
@@ -108,4 +108,4 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error10.xls'
         port_values = {}
         with self.assertRaises(InconsistentPositionGrandTotal):
-            read_bochk(filename, port_values)
+            read_holdings_bochk(filename, port_values)
