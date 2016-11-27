@@ -23,6 +23,12 @@ class InconsistentPosition(Exception):
 class InconsistentHolding(Exception):
 	pass
 
+class InconsistentPositionFieldsTotal(Exception):
+	pass
+
+class InconsistentPositionGrandTotal(Exception):
+	pass
+
 
 
 def read_bochk(filename, port_values):
@@ -198,6 +204,7 @@ def read_position_holding_detail(ws, row, fields, position):
 		else:
 			value = cell_value.strip()
 			if fld == 'holding_type':
+				# print('holding type: {0}'.format(value))
 				if value == 'NOM':
 					position['settled_units'] = holding_quantity
 				elif value == 'PENDING DELIVERY':
@@ -206,7 +213,7 @@ def read_position_holding_detail(ws, row, fields, position):
 					position['pending_receipt'] = position['pending_receipt'] + holding_quantity
 				else:
 					logger.error('read_position_holding_detail(): invalid holding type encountered, type={0}, at row {1}'.
-									format(position['holding_type'], row))
+									format(value, row))
 					raise InvalidHoldingType()
 
 				break
@@ -256,7 +263,7 @@ def read_position_available_balance(ws, row, fields, position):
 		cell_value = ws.cell_value(row, i)
 		if fld == 'holding_quantity':
 			if not isinstance(cell_value, float):
-				logger.error('read_position_available_balance(): available balance is not of type float, at row {1}, column {2}'.
+				logger.error('read_position_available_balance(): available balance is not of type float, at row {0}, column {1}'.
 								format(row, i))
 				raise TypeError
 
@@ -267,7 +274,12 @@ def read_position_available_balance(ws, row, fields, position):
 
 
 def validate_position(position):
-	# assume quantity do not have decimal places.
+	"""
+	Make sure the position's quantity, market price, market value are
+	consistent.
+
+	Assume quantity do not have decimal places.
+	"""
 	x = position['settled_units'] - position['pending_delivery'] + \
 		position['pending_receipt'] - position['sub_total']
 
@@ -279,7 +291,7 @@ def validate_position(position):
 	else:
 		z = position['sub_total']*position['market_price'] - position['market_value']
 
-	if 'exchange_rate' in position:
+	if 'exchange_rate' in position:	# position in All section has no exchange
 		z2 = position['market_value']*position['exchange_rate'] - position['equivalent_market_value']
 	else:
 		z2 = 0
@@ -288,9 +300,9 @@ def validate_position(position):
 	if x==0 and y==0 and abs(z) < 0.01 and abs(z2) < 0.01:
 		pass
 	else:
-		logger.error('validate_position(): inconsistent position: settled={0}, pending_delivery={1}, pending_receipt={2}, sub_total={3}, available={4}'.
-						format(position['settled_units'], position['pending_delivery'],
-								position['pending_receipt'], position['sub_total'], position['available_balance']))
+		logger.error('validate_position(): inconsistent position: market={0}, {1}={2}, settled_units={3}'.
+						format(position['market_code'], position['security_id_type'],
+								position['security_id'], position['settled_units']))
 		raise InconsistentPosition()
 
 
@@ -310,6 +322,7 @@ def read_grand_total(ws, row):
 		return cell_value
 	else:
 		logger.error('read_grand_total(): grand total is not of type float, at row {0}, column 20'.format(row))
+		raise TypeError
 
 
 
@@ -317,7 +330,7 @@ def is_blank_line(ws, row):
 	for i in range(5):
 		cell_value = ws.cell_value(row, i)
 
-		if not isinstance(cell_value, str) or not cell_value.strip() == '':
+		if not isinstance(cell_value, str) or cell_value.strip() != '':
 			return False
 
 	return True
@@ -335,7 +348,7 @@ def validate_all_holdings(holdings, grand_total):
 			logger.debug('validate_all_holdings(): validate security {0}'.format(position['security_id']))
 			if not is_position_fields_consistent(temp_dict[key], position, key_position_fields):
 				logger.error('validate_all_holdings(): inconsistent positions: {0}'.format(key))
-				raise InconsistentPosition()
+				raise InconsistentPositionFieldsTotal()
 		else:
 			if key in temp_dict:
 				merge_position_fields(temp_dict[key], position, key_position_fields)
@@ -345,9 +358,9 @@ def validate_all_holdings(holdings, grand_total):
 	if not grand_total is None:
 		grand_total_position = accumulate_position_total(holdings)
 		if abs(grand_total_position - grand_total) > 0.01:
-			logger.error('validate_all_holdings(): inconsistent grand_total: position total={0}, grand total={1}'.
+			logger.error('validate_all_holdings(): inconsistent grand total: position total={0}, grand total={1}'.
 							format(grand_total_position, grand_total))
-			raise InconsistentPosition()
+			raise InconsistentPositionGrandTotal()
 
 
 
@@ -356,7 +369,7 @@ def is_position_fields_consistent(position1, position2, key_position_fields):
 	# quantity 123, 123.0 are fine, but 123.1 are not. Because float
 	# comparison is different.
 	for fld in key_position_fields:
-		if not position1[fld] == position2[fld]:
+		if position1[fld] != position2[fld]:
 			return False
 
 	return True
