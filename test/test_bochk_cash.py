@@ -6,7 +6,7 @@ import unittest2
 from datetime import datetime
 from xlrd import open_workbook
 from bochk.utility import get_current_path
-from bochk.open_bochk import read_cash_fields, read_cash_line
+from bochk.open_bochk import read_cash_fields, read_cash_line, read_cash_bochk
 
 
 
@@ -111,6 +111,57 @@ class TestBOCHKCash(unittest2.TestCase):
 
 
 
+    def test_read_cash_bochk1(self):
+        filename = get_current_path() + '\\samples\\sample_cash1.xls'
+        port_values = {}
+        read_cash_bochk(filename, port_values)
+        cash_entries = port_values['cash']
+        cash_transactions = port_values['cash_transactions']
+        self.verify_cash1(cash_entries, cash_transactions)
+
+
+
+    def test_read_cash_bochk2(self):
+        filename = get_current_path() + '\\samples\\sample_cash2.xls'
+        port_values = {}
+        read_cash_bochk(filename, port_values)
+        cash_entries = port_values['cash']
+        cash_transactions = port_values['cash_transactions']
+        self.verify_cash2(cash_entries, cash_transactions)
+
+
+
+    def verify_cash1(self, cash_entries, cash_transactions):
+        """
+        For sample_cash1.xls
+        """
+        self.assertEqual(len(cash_entries), 3)
+        for entry in cash_entries:
+            if entry['Currency'] == 'HKD':
+                self.verify_cash_entry01(entry)
+            elif entry['Currency'] == 'USD':
+                self.verify_cash_entry02(entry)
+
+        self.assertEqual(len(cash_transactions), 3)
+        self.verify_cash_transaction02(cash_transactions[2])
+
+
+
+    def verify_cash2(self, cash_entries, cash_transactions):
+        """
+        For sample_cash2.xls
+        """
+        self.assertEqual(len(cash_entries), 3)
+        for entry in cash_entries:
+            if entry['Currency'] == 'HKD':
+                self.verify_cash_entry1(entry)
+            elif entry['Currency'] == 'USD':
+                self.verify_cash_entry2(entry)
+
+        self.assertEqual(len(cash_transactions), 0)
+
+
+
     def verify_cash_entry1(self, cash_entry):
         """
         The first entry in sample_cash2.xls
@@ -137,7 +188,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
     def verify_cash_entry01(self, cash_entry):
         """
-        The first entry in sample_cash2.xls
+        The first entry in sample_cash1.xls
         """
         self.assertEqual(len(cash_entry), 8)
         self.assertEqual(cash_entry['Account Name'], 'MAPLES TRUSTEE SERV (CY) LTD-CHINA LIFE FRANKLIN TT-CONCORD FOCUS INV')
@@ -149,7 +200,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
     def verify_cash_entry02(self, cash_entry):
         """
-        The last (5th) entry in sample_cash2.xls
+        The last (5th) entry in sample_cash1.xls
         """
         self.assertEqual(len(cash_entry), 9)
         self.assertEqual(cash_entry['Account Number'], '\'01287508062518')
@@ -162,7 +213,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
     def verify_cash_transaction02(self, cash_transaction):
         """
-        from the last (5th) entry in sample_cash2.xls
+        from the last (5th) entry in sample_cash1.xls
         """
         self.assertEqual(len(cash_transaction), 12)
         self.assertEqual(cash_transaction['Account Name'], 'MAPLES TRUSTEE SERV (CY) LTD-CHINA LIFE FRANKLIN TT-CONCORD FOCUS INV')

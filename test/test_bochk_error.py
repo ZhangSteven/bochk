@@ -8,7 +8,8 @@ from xlrd import open_workbook
 from bochk.utility import get_current_path
 from bochk.open_bochk import read_holdings_bochk, InvalidFieldName, InvalidHoldingType, \
                                 InconsistentPosition, InconsistentPositionFieldsTotal, \
-                                InconsistentPositionGrandTotal
+                                InconsistentPositionGrandTotal, InvalidCashEntry, \
+                                InvalidCashTransaction, read_cash_bochk
 
 
 
@@ -109,3 +110,27 @@ class TestBOCHKError(unittest2.TestCase):
         port_values = {}
         with self.assertRaises(InconsistentPositionGrandTotal):
             read_holdings_bochk(filename, port_values)
+
+
+
+    def test_cash_error1(self):
+        filename = get_current_path() + '\\samples\\cash_error.xls'
+        port_values = {}
+        with self.assertRaises(InvalidCashEntry):
+            read_cash_bochk(filename, port_values)
+
+
+
+    def test_cash_error2(self):
+        filename = get_current_path() + '\\samples\\cash_error2.xls'
+        port_values = {}
+        with self.assertRaises(InvalidCashTransaction):
+            read_cash_bochk(filename, port_values)
+
+
+
+    def test_cash_error3(self):
+        filename = get_current_path() + '\\samples\\cash_error3.xls'
+        port_values = {}
+        with self.assertRaises(InvalidCashTransaction):
+            read_cash_bochk(filename, port_values)

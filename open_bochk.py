@@ -181,6 +181,22 @@ def read_cash(ws, row, fields, port_values):
 
 
 
+def update_cash(cash, cash_entry):
+	key = (cash_entry['Account Name'], cash_entry['Account Number'])
+	cash[key] = cash_entry
+
+
+
+def convert_cash_to_list(cash):
+	cash_list = []
+	for key in cash.keys():
+		cash_list.append(cash[key])
+		# print(cash[key]['Currency'])
+
+	return cash_list
+
+
+
 def read_cash_line(ws, row, fields):
 	logger.debug('read_cash_line(): at row {0}'.format(row))
 	cash_entry = {}
