@@ -6,7 +6,8 @@ import unittest2
 from datetime import datetime
 from xlrd import open_workbook
 from bochk.utility import get_current_path
-from bochk.open_bochk import read_cash_fields, read_cash_line, read_cash_bochk
+from bochk.open_bochk import read_cash_fields, read_cash_line, read_cash_bochk, \
+                                read_holdings_bochk, get_cash_date_as_string
 
 
 
@@ -128,6 +129,42 @@ class TestBOCHKCash(unittest2.TestCase):
         cash_entries = port_values['cash']
         cash_transactions = port_values['cash_transactions']
         self.verify_cash2(cash_entries, cash_transactions)
+
+
+
+    def test_get_cash_date_as_string(self):
+        cash_file = get_current_path() + '\\samples\\sample_cash2.xls'
+        holdings_file = get_current_path() + '\\samples\\sample_holdings2.xls'
+        port_values = {}
+        read_cash_bochk(cash_file, port_values)
+        read_holdings_bochk(holdings_file, port_values)
+        cash_entry = port_values['cash'][0]
+        d = get_cash_date_as_string(port_values, cash_entry)
+        self.assertEqual(d, '2016-11-16')
+
+
+
+    def test_get_cash_date_as_string2(self):
+        cash_file = get_current_path() + '\\samples\\sample_holdings5_cash.xls'
+        holdings_file = get_current_path() + '\\samples\\sample_holdings5.xls'
+        port_values = {}
+        read_cash_bochk(cash_file, port_values)
+        read_holdings_bochk(holdings_file, port_values)
+        cash_entry = port_values['cash'][0]
+        d = get_cash_date_as_string(port_values, cash_entry)
+        self.assertEqual(d, '2016-7-6')
+
+
+
+    def test_get_cash_date_as_string3(self):
+        cash_file = get_current_path() + '\\samples\\sample_holdings4_cash.xls'
+        holdings_file = get_current_path() + '\\samples\\sample_holdings4.xls'
+        port_values = {}
+        read_cash_bochk(cash_file, port_values)
+        read_holdings_bochk(holdings_file, port_values)
+        cash_entry = port_values['cash'][0]
+        d = get_cash_date_as_string(port_values, cash_entry)
+        self.assertEqual(d, '2016-7-6')
 
 
 

@@ -7,15 +7,25 @@
 from xlrd import open_workbook
 from xlrd.xldate import xldate_as_datetime
 import xlrd
-import datetime
-from bochk.utility import logger, get_datemode, retrieve_or_create
+import csv
+from bochk.utility import logger, get_datemode, retrieve_or_create, \
+							get_current_path
 
 
+
+class PortfolioIdNotFound(Exception):
+	pass
+
+class InvalidCashAccountName(Exception):
+	pass
 
 class InvalidCashTransaction(Exception):
 	pass
 
 class InvalidCashEntry(Exception):
+	pass
+
+class InvalidHoldingAccountName(Exception):
 	pass
 
 class InvalidHoldingType(Exception):
@@ -554,3 +564,149 @@ def accumulate_position_total(holdings):
 			t = t + position['equivalent_market_value']
 
 	return t
+
+
+
+def map_cash_to_portfolio_id(cash_account_name):
+	"""
+	Map a cash account name to portfolio id.
+	"""
+	c_map = {
+		'MAPLES TRUSTEE SERV (CY) LTD-CHINA LIFE FRANKLIN TT-CONCORD FOCUS INV':'21815',
+		'CLT-CLI HK BR (CLASS A- HK TRUST FUND (SUB-FUND-BOND)':'12229',
+		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND - SUB FUND I':'12734',
+		'CLT-CLI HK BR (CLASS G- HK) TRUST FUND (SUB-FUND-BOND)':'12630',
+		'CLT-CLI HK BR TRUST FUND (CAPITAL) (SUB-FUND-BOND)':'12732',
+		'CLT-CLI OVERSEAS TRUST FUND (CAPITAL)(SUB-FUND-BOND)':'12733',
+		'CLT-CLI MACAU BR (CLASS A-MC) TRUST FUND (SUB-FUND-BOND)':'12366',
+		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND (SUB-FUND-TRADING BOND)':'12528',
+		'CLT-CHINA LIFE FRANKLIN CLIENTS ACCOUNT':'13456'
+	}
+
+	try:
+		return c_map[cash_account_name]
+	except KeyError:
+		logger.error('map_cash_to_portfolio_id(): {0} is not a valid cash account name'.
+						format(cash_account_name))
+		raise InvalidCashAccountName()
+
+
+
+def map_holding_to_portfolio_id(holding_account_name):
+	"""
+	Map a holding position account name to portfolio id.
+	"""
+
+	#################
+	# Need to FIX:
+	# Note that CLT-CLI HK BR (CLASS A - HK) TRUST FUND (SUB-FUND - TRADING BOND)
+	# is not here. We don't know its exact account name.
+	#################
+	h_map = {
+		'MAPLES TRUSTEE S(CY)LTD-CHINA L F TT-CONCORD F INV':'21815',
+		'CLT-CLI HK BR (CLS A-HK)TRUST FUND (SUB-FUND-BOND)':'12229',
+		'CLT-CLI HK BR(CLASS A-HK) TRUST FUND - SUB FUND I':'12734',
+		'CLT-CLI HK BR(CLS G-HK) TRUST FD (SUB-FUND-BOND)':'12630',
+		'CLT-CLI HK BR TRUST FUND (CAPITAL) (SUB-FUND-BOND)':'12732',
+		'CLT-CLI OVERSEAS TRUST FD (CAPITAL) (SUB-FD-BOND)':'12733',
+		'CLT-CLI MACAU BR(CLS A-MC)TRUST FD (SUB-FUND-BOND)':'12366',
+		'CLT-CHINA LIFE FRANKLIN CLIENTS ACCOUNT':'13456'
+	}
+
+	try:
+		return h_map[holding_account_name]
+	except KeyError:
+		logger.error('map_holding_to_portfolio_id(): {0} is not a valid holding account name'.
+						format(holding_account_name))
+		raise InvalidHoldingAccountName()
+
+
+
+def get_cash_date_as_string(port_values, cash_entry):
+	"""
+	For BOCHK, there is no date information in the cash file,
+	so we lookup the date in the corresponding holdings. In this
+	case, we assume the holdings file and the cash file are generated
+	on the same day.
+	"""
+	logger.warning('get_cash_date_as_string(): Using holdings date to represent cash date.')
+	holdings = port_values['holdings']
+	for position in holdings:
+		if map_holding_to_portfolio_id(position['account_name']) == \
+						map_cash_to_portfolio_id(cash_entry['Account Name']):
+			return convert_datetime_to_string(position['statement_date'])
+
+	logger.error('get_cash_date_as_string(): could not find a portfolio id for cash account:{0}'.
+					format(cash_entry['Account Name']))
+	raise PortfolioIdNotFound()
+
+
+
+def convert_datetime_to_string(dt):
+	"""
+	convert a datetime object to string in the 'yyyy-mm-dd' format.
+	"""
+	return '{0}-{1}-{2}'.format(dt.year, dt.month, dt.day)
+
+
+
+def write_csv(port_values):
+	"""
+	Write cash and holdings into csv files.
+	"""	
+	cash_file = get_current_path() + '\\cash.csv'
+	write_cash_csv(cash_file, port_values)
+
+	holding_file = get_current_path() + '\\holding.csv'
+	# write_holding_csv(holding_file, port_values)
+
+
+
+def write_cash_csv(cash_file, port_values):
+	with open(cash_file, 'w', newline='') as csvfile:
+		logger.debug('write_cash_csv(): {0}'.format(cash_file))
+		file_writer = csv.writer(csvfile)
+
+		fields = ['Account Number', 'Currency', 'Balance', 'Current Available Balance']
+		file_writer.writerow(['Portfolio', 'Date'] + fields)
+
+		for entry in port_values['cash']:
+			portfolio_date = get_cash_date_as_string(port_values, entry)
+			portfolio_id = map_cash_to_portfolio_id(entry['Account Name'])
+			row = [portfolio_id, portfolio_date]
+
+			for fld in fields:
+				if fld == 'Balance':
+					try:
+						item = entry['Ledger Balance']
+					except KeyError:
+						item = entry['Current Ledger Balance']
+				else:
+					item = entry[fld]
+
+				row.append(item)
+    		# end of for loop
+
+			file_writer.writerow(row)
+
+
+
+if __name__ == '__main__':
+	import sys
+	if len(sys.argv) < 2:
+		print('use python open_bochk.py <cash_file> <holdings_file>')
+		sys.exit(1)
+
+	cash_file = get_current_path() + '\\' + sys.argv[1]
+	holdings_file = get_current_path() + '\\' + sys.argv[2]
+
+	port_values = {}
+	try:
+		read_cash_bochk(cash_file, port_values)
+		read_holdings_bochk(holdings_file, port_values)
+		write_csv(port_values)
+	except:
+		logger.exception('open_bochk:main()')
+		print('something goes wrong, check log file.')
+	else:
+		print('OK')
