@@ -11,6 +11,13 @@ import datetime
 from bochk.utility import logger, get_datemode, retrieve_or_create
 
 
+
+class InvalidCashTransaction(Exception):
+	pass
+
+class InvalidCashEntry(Exception):
+	pass
+
 class InvalidHoldingType(Exception):
 	pass
 
@@ -20,8 +27,8 @@ class InvalidFieldName(Exception):
 class InconsistentPosition(Exception):
 	pass
 
-class InconsistentHolding(Exception):
-	pass
+# class InconsistentHolding(Exception):
+# 	pass
 
 class InconsistentPositionFieldsTotal(Exception):
 	pass
@@ -65,6 +72,8 @@ def read_cash_bochk(filename, port_values):
 			break
 		row = row + 1
 
+	fields = read_cash_fields(ws, row)
+	read_cash(ws, row+1, fields, port_values)
 
 	logger.debug('out of read_cash_bochk()')
 
@@ -130,6 +139,112 @@ def read_holdings_fields(ws, row):
 		column = column + 1
 
 	return fields
+
+
+
+def read_cash_fields(ws, row):
+	column = 0
+	fields = []
+	while column < ws.ncols:
+		cell_value = ws.cell_value(row, column)
+		if isinstance(cell_value, str) and cell_value.strip() == '':
+			break
+
+		fields.append(cell_value.strip())
+		column = column + 1
+
+	return fields
+
+
+
+def read_cash(ws, row, fields, port_values):
+	"""
+	Read the cash entries.
+	"""
+	cash = {}
+	cash_transactions = []
+	port_values['cash_transactions'] = cash_transactions
+
+	while row < ws.nrows:
+		if is_blank_line(ws, row):
+			break
+
+		cash_entry, cash_tran = read_cash_line(ws, row, fields)
+		if not cash_tran is None:
+			cash_transactions.append(cash_tran)
+		
+		update_cash(cash, cash_entry)
+		row = row + 1
+	# end of while loop
+
+	port_values['cash'] = convert_cash_to_list(cash)
+
+
+
+def read_cash_line(ws, row, fields):
+	logger.debug('read_cash_line(): at row {0}'.format(row))
+	cash_entry = {}
+	cash_transaction = None
+
+	column = 0
+	for fld in fields:
+		cell_value = ws.cell_value(row, column)
+		if fld in ['Account Name', 'Account Number', 'Account Type', 'Currency']:
+			if isinstance(cell_value, str) and cell_value.strip() != '':
+				cash_entry[fld] = cell_value.strip()
+			else:
+				logger.error('read_cash_line(): invalid cash entry at row {0}, column {1}, value={2}'.
+								format(row, column, cell_value))
+				raise InvalidCashEntry()
+
+		elif fld in ['Hold Amount', 'Float Amount', 'Credit Limit', 
+						'Current Ledger Balance', 'Current Available Balance', 
+						'Ledger Balance']:
+			if isinstance(cell_value, float):
+				cash_entry[fld] = cell_value
+			else:
+				pass	# just leave it
+
+		if fld == 'Processing Date / Time' and not is_empty_cell(cell_value):
+			cash_transaction = initialize_cash_transaction(cash_entry)
+
+		if cash_transaction != None and fld in ['Processing Date / Time', 'Value Date']:
+			if isinstance(cell_value, float):
+				cash_transaction[fld] = xldate_as_datetime(cell_value, get_datemode())
+			else:
+				logger.error('read_cash_line(): invalid cash transaction at row {0}, column {1}, value={2}'.
+								format(row, column, cell_value))
+				raise InvalidCashTransaction()
+
+		elif cash_transaction != None and fld == 'Amount':
+			if isinstance(cell_value, float):
+				cash_transaction[fld] = cell_value
+			else:
+				logger.error('read_cash_line(): invalid cash transaction at row {0}, column {1}, value={2}'.
+								format(row, column, cell_value))
+				raise InvalidCashTransaction()
+
+		elif cash_transaction != None and fld in ['Transaction Type', 'Debit / Credit', 'Transaction Reference', 
+						'Particulars', 'Cheque Number']:
+				if isinstance(cell_value, str):
+					cash_transaction[fld] = cell_value.strip()
+				elif isinstance(cell_value, float):
+					cash_transaction[fld] = str(int(cell_value))
+
+		column = column + 1
+	# end of for loop
+
+	return cash_entry, cash_transaction
+
+
+
+def initialize_cash_transaction(cash_entry):
+	cash_transaction = {}
+	for key in cash_entry.keys():
+		if key in ['Account Name', 'Account Number', 'Account Type', 'Currency']:
+			cash_transaction[key] = cash_entry[key]
+
+	return cash_transaction
 
 
 
@@ -348,12 +463,18 @@ def read_grand_total(ws, row):
 def is_blank_line(ws, row):
 	for i in range(5):
 		cell_value = ws.cell_value(row, i)
-
-		if not isinstance(cell_value, str) or cell_value.strip() != '':
+		if not is_empty_cell(cell_value):
 			return False
 
 	return True
 
+
+
+def is_empty_cell(cell_value):
+	if not isinstance(cell_value, str) or cell_value.strip() != '':
+		return False
+	else:
+		return True
 
 
 def validate_all_holdings(holdings, grand_total):
