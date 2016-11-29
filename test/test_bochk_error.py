@@ -10,7 +10,8 @@ from bochk.open_bochk import read_holdings_bochk, InvalidFieldName, InvalidHoldi
                                 InconsistentPosition, InconsistentPositionFieldsTotal, \
                                 InconsistentPositionGrandTotal, InvalidCashEntry, \
                                 InvalidCashTransaction, read_cash_bochk, read_holdings_bochk, \
-                                write_holding_csv, ISINcodeNotFound
+                                write_holding_csv, write_csv, ISINcodeNotFound, \
+                                InvalidCashAccountName
 
 
 
@@ -135,6 +136,17 @@ class TestBOCHKError(unittest2.TestCase):
         port_values = {}
         with self.assertRaises(InvalidCashTransaction):
             read_cash_bochk(filename, port_values)
+
+
+
+    def test_cash_error4(self):
+        holdings_file = get_current_path() + '\\samples\\sample_holdings2.xls'
+        cash_file = get_current_path() + '\\samples\\cash_error4.xls'
+        port_values = {}
+        read_cash_bochk(cash_file, port_values)
+        read_holdings_bochk(holdings_file, port_values)
+        with self.assertRaises(InvalidCashAccountName):
+            write_csv(port_values)
 
 
 
