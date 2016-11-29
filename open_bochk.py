@@ -13,6 +13,12 @@ from bochk.utility import logger, get_datemode, retrieve_or_create, \
 
 
 
+class ISINcodeNotFound(Exception):
+	pass
+
+class InvalidPortfolioId(Exception):
+	pass
+
 class PortfolioIdNotFound(Exception):
 	pass
 
@@ -596,12 +602,6 @@ def map_holding_to_portfolio_id(holding_account_name):
 	"""
 	Map a holding position account name to portfolio id.
 	"""
-
-	#################
-	# Need to FIX:
-	# Note that CLT-CLI HK BR (CLASS A - HK) TRUST FUND (SUB-FUND - TRADING BOND)
-	# is not here. We don't know its exact account name.
-	#################
 	h_map = {
 		'MAPLES TRUSTEE S(CY)LTD-CHINA L F TT-CONCORD F INV':'21815',
 		'CLT-CLI HK BR (CLS A-HK)TRUST FUND (SUB-FUND-BOND)':'12229',
@@ -619,6 +619,29 @@ def map_holding_to_portfolio_id(holding_account_name):
 		logger.error('map_holding_to_portfolio_id(): {0} is not a valid holding account name'.
 						format(holding_account_name))
 		raise InvalidHoldingAccountName()
+
+
+
+def lookup_accounting_treatment(portfolio_id):
+	"""
+	Map a portfolio id to its accounting treatment.
+	"""
+	a_map = {
+		'21815':'Trading',
+		'12229':'HTM',
+		'12734':'HTM',
+		'12630':'HTM',
+		'12732':'HTM',
+		'12733':'HTM',
+		'12366':'HTM',
+		'13456':'Trading'
+	}
+	try:
+		return a_map[portfolio_id]
+	except KeyError:
+		logger.error('lookup_accounting_treatment(): {0} is not a valid portfolio id'.
+						format(portfolio_id))
+		raise InvalidPortfolioId()
 
 
 
@@ -658,7 +681,7 @@ def write_csv(port_values):
 	write_cash_csv(cash_file, port_values)
 
 	holding_file = get_current_path() + '\\holding.csv'
-	# write_holding_csv(holding_file, port_values)
+	write_holding_csv(holding_file, port_values)
 
 
 
@@ -688,6 +711,47 @@ def write_cash_csv(cash_file, port_values):
     		# end of for loop
 
 			file_writer.writerow(row)
+
+
+
+def write_holding_csv(holding_file, port_values):
+	with open(holding_file, 'w', newline='') as csvfile:
+		logger.debug('write_holding_csv(): {0}'.format(holding_file))
+		file_writer = csv.writer(csvfile)
+
+		fields = ['statement_date', 'market_code', 'market_name', 'isin', 
+					'security_name', 'quantity_type', 'settled_units', 
+					'pending_receipt', 'pending_delivery','sub_total',
+					'available_balance', 'market_price_currency', 
+					'market_price', 'market_value', 'exchange_currency_pair', 
+					'exchange_rate', 'equivalent_currency', 'equivalent_market_value']
+
+		file_writer.writerow(['portfolio', 'custodian_account', 'accounting_treatment'] + fields)
+
+		for position in port_values['holdings']:
+			portfolio_id = map_holding_to_portfolio_id(position['account_name'])
+			accounting_treatment = lookup_accounting_treatment(portfolio_id)
+			custodian_account = 'BOCHK'
+			row = [portfolio_id, custodian_account, accounting_treatment]
+
+			for fld in fields:
+				if fld == 'isin':
+					if position['security_id_type'] == 'ISIN':
+						item = position['security_id']
+					else:
+						logger.error('write_holding_csv(): No ISIN code found, security id type={0}, security id={1}'.
+										format(position['security_id_type'], position['security_id']))
+						raise ISINcodeNotFound()
+				elif fld == 'statement_date':
+					item = convert_datetime_to_string(position[fld])
+				else:
+					item = position[fld]
+
+				row.append(item)
+			# end of inner for
+
+			file_writer.writerow(row)
+		# end of outer for loop
 
 
 
