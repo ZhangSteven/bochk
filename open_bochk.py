@@ -645,6 +645,56 @@ def lookup_accounting_treatment(portfolio_id):
 
 
 
+investment_lookup = {}
+def initialize_investment_lookup(lookup_file='investmentLookup.xls'):
+	"""
+	Initialize the lookup table from a file, for those securities that
+	do have an isin code.
+
+	To lookup,
+
+	isin, bbg_id = investment_lookup(security_id_type, security_id)
+	"""
+	filename = get_current_path() + '\\' + lookup_file
+	logger.debug('initialize_investment_lookup(): on file {0}'.format(lookup_file))
+
+	wb = open_workbook(filename=filename)
+	ws = wb.sheet_by_name('Sheet1')
+	row = 1
+	global investment_lookup
+	while (row < ws.nrows):
+		security_id_type = ws.cell_value(row, 0)
+		if security_id_type.strip() == '':
+			break
+
+		security_id = ws.cell_value(row, 1)
+		isin = ws.cell_value(row, 3)
+		bbg_id = ws.cell_value(row, 4)
+		if isinstance(security_id, float):
+			security_id = str(int(security_id))
+
+		investment_lookup[(security_id_type.strip(), security_id.strip())] = \
+			(isin.strip(), bbg_id.strip())
+
+		row = row + 1
+	# end of while loop 
+
+
+
+def lookup_isin_code(security_id_type, security_id):
+	global investment_lookup
+	if len(investment_lookup) == 0:
+		initialize_investment_lookup()
+
+	try:
+		return investment_lookup[(security_id_type, security_id)]
+	except KeyError:
+		logger.error('lookup_isin_code(): No ISIN code found, security_id_type={0}, security_id={1}'.
+						format(security_id_type, security_id))
+		raise ISINcodeNotFound()
+
+
+
 def get_cash_date_as_string(port_values, cash_entry):
 	"""
 	For BOCHK, there is no date information in the cash file,
@@ -719,8 +769,8 @@ def write_holding_csv(holding_file, port_values):
 		logger.debug('write_holding_csv(): {0}'.format(holding_file))
 		file_writer = csv.writer(csvfile)
 
-		fields = ['statement_date', 'market_code', 'market_name', 'isin', 
-					'security_name', 'quantity_type', 'settled_units', 
+		fields = ['statement_date', 'market_code', 'market_name', 'isin',
+					'bloomberg_figi', 'security_name', 'quantity_type', 'settled_units', 
 					'pending_receipt', 'pending_delivery','sub_total',
 					'available_balance', 'market_price_currency', 
 					'market_price', 'market_value', 'exchange_currency_pair', 
@@ -729,6 +779,9 @@ def write_holding_csv(holding_file, port_values):
 		file_writer.writerow(['portfolio', 'custodian_account', 'accounting_treatment'] + fields)
 
 		for position in port_values['holdings']:
+			if position['account_number'] == 'All':
+				continue
+
 			portfolio_id = map_holding_to_portfolio_id(position['account_name'])
 			accounting_treatment = lookup_accounting_treatment(portfolio_id)
 			custodian_account = 'BOCHK'
@@ -739,13 +792,17 @@ def write_holding_csv(holding_file, port_values):
 					if position['security_id_type'] == 'ISIN':
 						item = position['security_id']
 					else:
-						logger.error('write_holding_csv(): No ISIN code found, security id type={0}, security id={1}'.
-										format(position['security_id_type'], position['security_id']))
-						raise ISINcodeNotFound()
+						isin, bbg_id = lookup_isin_code(position['security_id_type'], position['security_id'])
+						item = isin
+						position['bloomberg_figi'] = bbg_id
+
 				elif fld == 'statement_date':
 					item = convert_datetime_to_string(position[fld])
 				else:
-					item = position[fld]
+					try:
+						item = position[fld]
+					except KeyError:
+						item = ''
 
 				row.append(item)
 			# end of inner for

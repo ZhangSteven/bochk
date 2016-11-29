@@ -3,3 +3,7 @@ __pycache__/
 
 # ignore the log file
 bochk.log
+
+# ignore the result file
+cash.csv
+holding.csv
