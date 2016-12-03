@@ -3,9 +3,9 @@
 # from config_logging package, provides a config object (from config file)
 # and a logger object (logging to a file).
 # 
-import logging
-import configparser
-import os
+
+import configparser, os
+from config_logging.file_logger import get_file_logger
 
 
 
@@ -45,46 +45,23 @@ if not 'config' in globals():
 
 
 
-def convert_log_level(log_level):
+def get_base_directory():
 	"""
-	Convert the log level specified in the config file to the numerical
-	values required by the logging module.
+	The directory where the log file resides.
 	"""
-	if log_level == 'debug':
-		return logging.DEBUG
-	elif log_level == 'info':
-		return logging.INFO
-	elif log_level == 'warning':
-		return logging.WARNING
-	elif log_level == 'error':
-		return logging.ERROR
-	elif log_level == 'critical':
-		return logging.CRITICAL
-	else:
-		return logging.DEBUG
+	global config
+	directory = config['logging']['directory']
+	if directory == '':
+		directory = get_current_path()
+
+	return directory
 
 
 
 def _setup_logging():
-    """ 
-    Setup logging parameters, supposed to be called only once.
-
-    Original code from:
-    https://gimmebar-assets.s3.amazonaws.com/4fe38b76be0a5.html
-    """
-
-    # use the config object
-    global config
-
-    fn = config['logging']['log_file']
-    fn = get_current_path() + '\\' + fn
-    # print(fn)
-    fmt='%(asctime)s - %(module)s - %(levelname)s: %(message)s'
+    fn = get_base_directory() + '\\' + config['logging']['log_file']
     log_level = config['logging']['log_level']
-    log_level = convert_log_level(log_level)
-
-    logging.basicConfig(level=log_level, filename=fn, format=fmt)
-    return logging.getLogger('root')
+    return get_file_logger(fn, log_level)
 
 
 
@@ -110,22 +87,13 @@ def get_datemode():
 
 
 
-def retrieve_or_create(port_values, key):
+def get_input_directory():
 	"""
-	retrieve or create the holding objects (list of dictionary) from the 
-	port_values object, the holding place for all items in the portfolio.
+	Read directory from the config object and return it.
 	"""
+	global config
+	directory = config['input']['directory']
+	if directory.strip() == '':
+		directory = get_current_path()
 
-	if key in port_values:	# key exists, retrieve
-		holding = port_values[key]	
-	else:					# key doesn't exist, create
-		if key in ['accounts']:
-			holding = []
-		else:
-			# not implemented yet
-			logger.error('retrieve_or_create(): invalid key: {0}'.format(key))
-			raise ValueError('invalid_key')
-
-		port_values[key] = holding
-
-	return holding
+	return directory

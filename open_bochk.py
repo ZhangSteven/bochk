@@ -6,10 +6,9 @@
 
 from xlrd import open_workbook
 from xlrd.xldate import xldate_as_datetime
-import xlrd
-import csv
-from bochk.utility import logger, get_datemode, retrieve_or_create, \
-							get_current_path
+import csv, argparse, os, sys
+from bochk.utility import logger, get_datemode, get_current_path, \
+							get_input_directory
 
 
 
@@ -727,10 +726,10 @@ def write_csv(port_values):
 	"""
 	Write cash and holdings into csv files.
 	"""	
-	cash_file = get_current_path() + '\\cash.csv'
+	cash_file = get_input_directory() + '\\cash.csv'
 	write_cash_csv(cash_file, port_values)
 
-	holding_file = get_current_path() + '\\holding.csv'
+	holding_file = get_input_directory() + '\\holding.csv'
 	write_holding_csv(holding_file, port_values)
 
 
@@ -813,13 +812,21 @@ def write_holding_csv(holding_file, port_values):
 
 
 if __name__ == '__main__':
-	import sys
-	if len(sys.argv) < 2:
-		print('use python open_bochk.py <cash_file> <holdings_file>')
+	parser = argparse.ArgumentParser(description='Read cash and position files from BOC HK, then convert to Geneva format for reconciliation purpose. Check the config file for path to those files.')
+	parser.add_argument('cash_file')
+	parser.add_argument('holdings_file')
+	args = parser.parse_args()
+
+
+	cash_file = get_input_directory() + '\\' + args.cash_file
+	if not os.path.exists(cash_file):
+		print('{0} does not exist'.format(cash_file))
 		sys.exit(1)
 
-	cash_file = get_current_path() + '\\' + sys.argv[1]
-	holdings_file = get_current_path() + '\\' + sys.argv[2]
+	holdings_file = get_input_directory() + '\\' + args.holdings_file
+	if not os.path.exists(holdings_file):
+		print('{0} does not exist'.format(holdings_file))
+		sys.exit(1)
 
 	port_values = {}
 	try:
