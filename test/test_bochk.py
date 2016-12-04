@@ -277,7 +277,16 @@ class TestBOCHK(unittest2.TestCase):
         position['security_id'] = 'HSBCFN13014'
         portfolio_id = '12229'    # HTM
         populate_investment_ids(portfolio_id, position)
-        self.assertEqual(position['geneva_investment_id'], 'CMU_HSBCFN13014 HTM')
+        self.assertEqual(position['geneva_investment_id'], 'HK0000163607 HTM')
+        self.assertTrue('bloomberg_figi' not in position and \
+                        'isin' not in position)
+
+        position = {}
+        position['security_id_type'] = 'CMU'
+        position['security_id'] = 'WLHKFN09007'
+        portfolio_id = '12229'    # HTM
+        populate_investment_ids(portfolio_id, position)
+        self.assertEqual(position['geneva_investment_id'], 'CMU_WLHKFN09007 HTM')
         self.assertTrue('bloomberg_figi' not in position and \
                         'isin' not in position)
 

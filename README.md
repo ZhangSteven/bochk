@@ -25,6 +25,13 @@ Todo
 
 
 ++++++++++
+ver 0.13
+++++++++++
+1. Bug fix: when a position's security_id_type is not "ISIN", but can actually lookup an isin, its geneva investmend id fo HTM position now is isin + " HTM".
+
+
+
+++++++++++
 ver 0.12
 ++++++++++
 1. In output csv file, the geneva_investment_id column replaces the accounting_treatment column, to solve the problem of HTM bonds may not having ISIN code in Geneva security master. For a HTM position, only the geneva_investment_id column will have output, where for trading position, either the isin or bloomberg_figi column have output.

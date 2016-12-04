@@ -681,7 +681,10 @@ def populate_investment_ids(portfolio_id, position):
 			position['isin'] = isin
 			position['bloomberg_figi'] = bbg_id
 		else:
-			position['geneva_investment_id'] = geneva_investment_id
+			if isin != '':
+				position['geneva_investment_id'] = isin + ' HTM'
+			else:
+				position['geneva_investment_id'] = geneva_investment_id
 
 
 
