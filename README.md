@@ -20,7 +20,19 @@ Note
 ++++++++++
 Todo
 ++++++++++
-1. The program now output ISIN and Bloomberg FIGI as the identifier. It's OK for the concord fund. But for those HTM funds, because a HTM bond will not have ISIN in the security master if it is also in a AFS position in another fund. So we need to output another "geneva_investment_id" column, we can get rid of the "accounting treatment" column.
+1. The investment lookup function, is repeated with other projects, like trade_converter and jpm, consider move this part to an independant project, so we can centralize lookup and checking.
+
+2. Consider creating a lookup table:
+
+security_id_type, security_id, bloomberg_figi, geneva_investment_id for HTM
+
+
+
+++++++++++
+ver 0.12
+++++++++++
+1. In output csv file, the geneva_investment_id column replaces the accounting_treatment column, to solve the problem of HTM bonds may not having ISIN code in Geneva security master.
+
 
 
 ++++++++++

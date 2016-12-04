@@ -621,7 +621,7 @@ def map_holding_to_portfolio_id(holding_account_name):
 
 
 
-def lookup_accounting_treatment(portfolio_id):
+def get_portfolio_accounting_treatment(portfolio_id):
 	"""
 	Map a portfolio id to its accounting treatment.
 	"""
@@ -638,9 +638,41 @@ def lookup_accounting_treatment(portfolio_id):
 	try:
 		return a_map[portfolio_id]
 	except KeyError:
-		logger.error('lookup_accounting_treatment(): {0} is not a valid portfolio id'.
+		logger.error('get_portfolio_accounting_treatment(): {0} is not a valid portfolio id'.
 						format(portfolio_id))
 		raise InvalidPortfolioId()
+
+
+
+def populate_investment_ids(portfolio_id, position):
+	"""
+	Populate a position with 3 ids:
+
+	1. isin
+	2. geneva investment id (only if portfolio is a HTM portfolio and
+		the position is a bond)
+	3. bloomberg figi (only if no isin is there)
+	"""
+	if fld == 'geneva_investment_id':
+
+	if position['security_id_type'] == 'ISIN':
+		position['isin'] = position['security_id']
+	else:
+		isin, bbg_id = lookup_isin_code(position['security_id_type'], position['security_id'])
+		position['isin'] = isin
+		position['bloomberg_figi'] = bbg_id
+
+
+	# what if a bond:
+	# 1. has a CMU code,
+	# 2. is in a HTM position,
+	#
+	# special case handling is needed.
+	if (get_portfolio_accounting_treatment(portfolio_id) == 'HTM') and \
+		position['quantity_type'] == 'FAMT':
+
+		if position['']
+
 
 
 
@@ -768,34 +800,27 @@ def write_holding_csv(holding_file, port_values):
 		logger.debug('write_holding_csv(): {0}'.format(holding_file))
 		file_writer = csv.writer(csvfile)
 
-		fields = ['statement_date', 'market_code', 'market_name', 'isin',
-					'bloomberg_figi', 'security_name', 'quantity_type', 'settled_units', 
-					'pending_receipt', 'pending_delivery','sub_total',
-					'available_balance', 'market_price_currency', 
-					'market_price', 'market_value', 'exchange_currency_pair', 
-					'exchange_rate', 'equivalent_currency', 'equivalent_market_value']
+		fields = ['statement_date', 'market_code', 'market_name', 'geneva_investment_id',
+					'isin', 'bloomberg_figi', 'security_name', 'quantity_type', 
+					'settled_units', 'pending_receipt', 'pending_delivery','sub_total',
+					'available_balance', 'market_price_currency', 'market_price', 
+					'market_value', 'exchange_currency_pair', 'exchange_rate', 
+					'equivalent_currency', 'equivalent_market_value']
 
-		file_writer.writerow(['portfolio', 'custodian_account', 'accounting_treatment'] + fields)
+		file_writer.writerow(['portfolio', 'custodian_account'] + fields)
 
 		for position in port_values['holdings']:
 			if position['account_number'] == 'All':
 				continue
 
 			portfolio_id = map_holding_to_portfolio_id(position['account_name'])
-			accounting_treatment = lookup_accounting_treatment(portfolio_id)
 			custodian_account = 'BOCHK'
-			row = [portfolio_id, custodian_account, accounting_treatment]
+			row = [portfolio_id, custodian_account]
 
+			populate_investment_ids(portfolio_id, position)
 			for fld in fields:
-				if fld == 'isin':
-					if position['security_id_type'] == 'ISIN':
-						item = position['security_id']
-					else:
-						isin, bbg_id = lookup_isin_code(position['security_id_type'], position['security_id'])
-						item = isin
-						position['bloomberg_figi'] = bbg_id
 
-				elif fld == 'statement_date':
+				if fld == 'statement_date':
 					item = convert_datetime_to_string(position[fld])
 				else:
 					try:
