@@ -10,8 +10,9 @@ from bochk.open_bochk import read_holdings_bochk, InvalidFieldName, InvalidHoldi
                                 InconsistentPosition, InconsistentPositionFieldsTotal, \
                                 InconsistentPositionGrandTotal, InvalidCashEntry, \
                                 InvalidCashTransaction, read_cash_bochk, read_holdings_bochk, \
-                                write_holding_csv, write_csv, ISINcodeNotFound, \
-                                InvalidCashAccountName
+                                write_holding_csv, write_csv, UnhandledPosition, \
+                                InvalidCashAccountName, InvestmentIdNotFound, \
+                                populate_investment_ids, initialize_investment_lookup
 
 
 
@@ -150,11 +151,24 @@ class TestBOCHKError(unittest2.TestCase):
 
 
 
+    def test_populate_investment_ids(self):
+        lookup_file = '\\samples\\sample_investmentLookup.xls'
+        initialize_investment_lookup(lookup_file)
+        position = {}
+        position['security_id_type'] = 'ISIN'
+        position['security_id'] = 'xyz'
+        position['quantity_type'] = 'units' # not a bond
+        portfolio_id = '12229'    # HTM
+        with self.assertRaises(UnhandledPosition):
+            populate_investment_ids(portfolio_id, position)
+
+
+
     def test_output_error(self):
         filename = get_current_path() + '\\samples\\sample_holdings_error11.xls'
         port_values = {}
         read_holdings_bochk(filename, port_values)
         holding_file = get_current_path() + '\\holding.csv'
     
-        with self.assertRaises(ISINcodeNotFound):
+        with self.assertRaises(InvestmentIdNotFound):
             write_holding_csv(holding_file, port_values)

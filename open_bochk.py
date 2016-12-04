@@ -12,7 +12,10 @@ from bochk.utility import logger, get_datemode, get_current_path, \
 
 
 
-class ISINcodeNotFound(Exception):
+class UnhandledPosition(Exception):
+	pass
+
+class InvestmentIdNotFound(Exception):
 	pass
 
 class InvalidPortfolioId(Exception):
@@ -653,26 +656,32 @@ def populate_investment_ids(portfolio_id, position):
 		the position is a bond)
 	3. bloomberg figi (only if no isin is there)
 	"""
-	if fld == 'geneva_investment_id':
-
 	if position['security_id_type'] == 'ISIN':
-		position['isin'] = position['security_id']
+		isin = position['security_id']
 	else:
-		isin, bbg_id = lookup_isin_code(position['security_id_type'], position['security_id'])
+		isin = None
+
+	accounting_treatment = get_portfolio_accounting_treatment(portfolio_id)
+	if accounting_treatment == 'HTM' and not isin is None:
+		if position['quantity_type'] == 'FAMT':	# it's a bond
+			position['geneva_investment_id'] = isin + ' HTM'
+		else:
+			# strange things happened, a HTM position, but the quantity type
+			# is not FAMT, then it is not a bond, what it is?
+			logger.error('populate_investment_ids(): unhandled position: portfolio {0}, isin {1}'.
+							format(portfolio_id, isin))
+			raise UnhandledPosition()
+
+	elif accounting_treatment == 'Trading' and not isin is None:
 		position['isin'] = isin
-		position['bloomberg_figi'] = bbg_id
 
-
-	# what if a bond:
-	# 1. has a CMU code,
-	# 2. is in a HTM position,
-	#
-	# special case handling is needed.
-	if (get_portfolio_accounting_treatment(portfolio_id) == 'HTM') and \
-		position['quantity_type'] == 'FAMT':
-
-		if position['']
-
+	else:
+		isin, bbg_id, geneva_investment_id = lookup_investment_id(position['security_id_type'], position['security_id'])
+		if accounting_treatment == 'Trading':
+			position['isin'] = isin
+			position['bloomberg_figi'] = bbg_id
+		else:
+			position['geneva_investment_id'] = geneva_investment_id
 
 
 
@@ -701,18 +710,19 @@ def initialize_investment_lookup(lookup_file='investmentLookup.xls'):
 		security_id = ws.cell_value(row, 1)
 		isin = ws.cell_value(row, 3)
 		bbg_id = ws.cell_value(row, 4)
+		investment_id = ws.cell_value(row, 5)
 		if isinstance(security_id, float):
 			security_id = str(int(security_id))
 
 		investment_lookup[(security_id_type.strip(), security_id.strip())] = \
-			(isin.strip(), bbg_id.strip())
+			(isin.strip(), bbg_id.strip(), investment_id.strip())
 
 		row = row + 1
 	# end of while loop 
 
 
 
-def lookup_isin_code(security_id_type, security_id):
+def lookup_investment_id(security_id_type, security_id):
 	global investment_lookup
 	if len(investment_lookup) == 0:
 		initialize_investment_lookup()
@@ -720,9 +730,9 @@ def lookup_isin_code(security_id_type, security_id):
 	try:
 		return investment_lookup[(security_id_type, security_id)]
 	except KeyError:
-		logger.error('lookup_isin_code(): No ISIN code found, security_id_type={0}, security_id={1}'.
+		logger.error('lookup_investment_id(): No record found for security_id_type={0}, security_id={1}'.
 						format(security_id_type, security_id))
-		raise ISINcodeNotFound()
+		raise InvestmentIdNotFound()
 
 
 
