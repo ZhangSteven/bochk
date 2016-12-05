@@ -144,10 +144,11 @@ class TestBOCHKError(unittest2.TestCase):
         holdings_file = get_current_path() + '\\samples\\sample_holdings2.xls'
         cash_file = get_current_path() + '\\samples\\cash_error4.xls'
         port_values = {}
+        directory = get_current_path() + '\\samples'
         read_cash_bochk(cash_file, port_values)
         read_holdings_bochk(holdings_file, port_values)
         with self.assertRaises(InvalidCashAccountName):
-            write_csv(port_values)
+            write_csv(port_values, directory)
 
 
 
@@ -168,7 +169,7 @@ class TestBOCHKError(unittest2.TestCase):
         filename = get_current_path() + '\\samples\\sample_holdings_error11.xls'
         port_values = {}
         read_holdings_bochk(filename, port_values)
-        holding_file = get_current_path() + '\\holding.csv'
+        holding_file = get_current_path() + '\\samples\\holding.csv'
     
         with self.assertRaises(InvestmentIdNotFound):
             write_holding_csv(holding_file, port_values)

@@ -5,5 +5,5 @@ __pycache__/
 bochk.log
 
 # ignore the result file
-cash.csv
-holding.csv
+samples/cash.csv
+samples/holding.csv

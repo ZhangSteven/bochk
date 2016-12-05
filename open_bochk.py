@@ -767,14 +767,14 @@ def convert_datetime_to_string(dt):
 
 
 
-def write_csv(port_values):
+def write_csv(port_values, directory=get_input_directory()):
 	"""
 	Write cash and holdings into csv files.
 	"""	
-	cash_file = get_input_directory() + '\\cash.csv'
+	cash_file = directory + '\\cash.csv'
 	write_cash_csv(cash_file, port_values)
 
-	holding_file = get_input_directory() + '\\holding.csv'
+	holding_file = directory + '\\holding.csv'
 	write_holding_csv(holding_file, port_values)
 
 

@@ -25,6 +25,15 @@ Todo
 
 
 ++++++++++
+ver 0.14
+++++++++++
+1. Bug fix: when the configure file changes the path (we have different input file path in office and home PCs), one test fails.
+
+2. The investmentLookup.xls is added more comments.
+
+
+
+++++++++++
 ver 0.13
 ++++++++++
 1. Bug fix: when a position's security_id_type is not "ISIN", but can actually lookup an isin, its geneva investmend id fo HTM position now is isin + " HTM".
