@@ -9,6 +9,10 @@ from config_logging.file_logger import get_file_logger
 
 
 
+class InvalidDatamode(Exception):
+	pass
+
+
 def get_current_path():
 	"""
 	Get the absolute path to the directory where this module is in.
@@ -81,7 +85,7 @@ def get_datemode():
 		datemode = int(d)
 	except:
 		logger.error('get_datemode(): invalid datemode value: {0}'.format(d))
-		raise
+		raise InvalidDatamode()
 
 	return datemode
 

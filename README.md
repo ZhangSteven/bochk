@@ -25,6 +25,13 @@ Todo
 
 
 ++++++++++
+ver 0.15
+++++++++++
+1. Bug fix: in utility.py, the get_datemode() function raises nothing when datemode value is invalid.
+
+
+
+++++++++++
 ver 0.14
 ++++++++++
 1. Bug fix: when the configure file changes the path (we have different input file path in office and home PCs), one test fails.
