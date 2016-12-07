@@ -9,16 +9,10 @@ from xlrd.xldate import xldate_as_datetime
 import csv, argparse, os, sys
 from bochk.utility import logger, get_datemode, get_current_path, \
 							get_input_directory
-
+from investment_lookup.id_lookup import get_investment_Ids
 
 
 class UnhandledPosition(Exception):
-	pass
-
-class InvestmentIdNotFound(Exception):
-	pass
-
-class InvalidPortfolioId(Exception):
 	pass
 
 class PortfolioIdNotFound(Exception):
@@ -624,121 +618,6 @@ def map_holding_to_portfolio_id(holding_account_name):
 
 
 
-def get_portfolio_accounting_treatment(portfolio_id):
-	"""
-	Map a portfolio id to its accounting treatment.
-	"""
-	a_map = {
-		'21815':'Trading',
-		'12229':'HTM',
-		'12734':'HTM',
-		'12630':'HTM',
-		'12732':'HTM',
-		'12733':'HTM',
-		'12366':'HTM',
-		'13456':'Trading'
-	}
-	try:
-		return a_map[portfolio_id]
-	except KeyError:
-		logger.error('get_portfolio_accounting_treatment(): {0} is not a valid portfolio id'.
-						format(portfolio_id))
-		raise InvalidPortfolioId()
-
-
-
-def populate_investment_ids(portfolio_id, position):
-	"""
-	Populate a position with 3 ids:
-
-	1. isin
-	2. geneva investment id (only if portfolio is a HTM portfolio and
-		the position is a bond)
-	3. bloomberg figi (only if no isin is there)
-	"""
-	if position['security_id_type'] == 'ISIN':
-		isin = position['security_id']
-	else:
-		isin = None
-
-	accounting_treatment = get_portfolio_accounting_treatment(portfolio_id)
-	if accounting_treatment == 'HTM' and not isin is None:
-		if position['quantity_type'] == 'FAMT':	# it's a bond
-			position['geneva_investment_id'] = isin + ' HTM'
-		else:
-			# strange things happened, a HTM position, but the quantity type
-			# is not FAMT, then it is not a bond, what it is?
-			logger.error('populate_investment_ids(): unhandled position: portfolio {0}, isin {1}'.
-							format(portfolio_id, isin))
-			raise UnhandledPosition()
-
-	elif accounting_treatment == 'Trading' and not isin is None:
-		position['isin'] = isin
-
-	else:
-		isin, bbg_id, geneva_investment_id = lookup_investment_id(position['security_id_type'], position['security_id'])
-		if accounting_treatment == 'Trading':
-			position['isin'] = isin
-			position['bloomberg_figi'] = bbg_id
-		else:
-			if isin != '':
-				position['geneva_investment_id'] = isin + ' HTM'
-			else:
-				position['geneva_investment_id'] = geneva_investment_id
-
-
-
-investment_lookup = {}
-def initialize_investment_lookup(lookup_file='investmentLookup.xls'):
-	"""
-	Initialize the lookup table from a file, for those securities that
-	do have an isin code.
-
-	To lookup,
-
-	isin, bbg_id = investment_lookup(security_id_type, security_id)
-	"""
-	filename = get_current_path() + '\\' + lookup_file
-	logger.debug('initialize_investment_lookup(): on file {0}'.format(lookup_file))
-
-	wb = open_workbook(filename=filename)
-	ws = wb.sheet_by_name('Sheet1')
-	row = 1
-	global investment_lookup
-	while (row < ws.nrows):
-		security_id_type = ws.cell_value(row, 0)
-		if security_id_type.strip() == '':
-			break
-
-		security_id = ws.cell_value(row, 1)
-		isin = ws.cell_value(row, 3)
-		bbg_id = ws.cell_value(row, 4)
-		investment_id = ws.cell_value(row, 5)
-		if isinstance(security_id, float):
-			security_id = str(int(security_id))
-
-		investment_lookup[(security_id_type.strip(), security_id.strip())] = \
-			(isin.strip(), bbg_id.strip(), investment_id.strip())
-
-		row = row + 1
-	# end of while loop 
-
-
-
-def lookup_investment_id(security_id_type, security_id):
-	global investment_lookup
-	if len(investment_lookup) == 0:
-		initialize_investment_lookup()
-
-	try:
-		return investment_lookup[(security_id_type, security_id)]
-	except KeyError:
-		logger.error('lookup_investment_id(): No record found for security_id_type={0}, security_id={1}'.
-						format(security_id_type, security_id))
-		raise InvestmentIdNotFound()
-
-
-
 def get_cash_date_as_string(port_values, cash_entry):
 	"""
 	For BOCHK, there is no date information in the cash file,
@@ -813,24 +692,28 @@ def write_holding_csv(holding_file, port_values):
 		logger.debug('write_holding_csv(): {0}'.format(holding_file))
 		file_writer = csv.writer(csvfile)
 
-		fields = ['statement_date', 'market_code', 'market_name', 'geneva_investment_id',
-					'isin', 'bloomberg_figi', 'security_name', 'quantity_type', 
-					'settled_units', 'pending_receipt', 'pending_delivery','sub_total',
-					'available_balance', 'market_price_currency', 'market_price', 
-					'market_value', 'exchange_currency_pair', 'exchange_rate', 
-					'equivalent_currency', 'equivalent_market_value']
+		fields = ['statement_date', 'market_code', 'market_name', 'security_name', 
+					'quantity_type', 'settled_units', 'pending_receipt', 
+					'pending_delivery','sub_total', 'available_balance', 
+					'market_price_currency', 'market_price', 'market_value', 
+					'exchange_currency_pair', 'exchange_rate', 'equivalent_currency', 
+					'equivalent_market_value']
 
-		file_writer.writerow(['portfolio', 'custodian_account'] + fields)
+		file_writer.writerow(['portfolio', 'custodian_account', 'geneva_investment_id',
+								'isin', 'bloomberg_figi'] + fields)
 
 		for position in port_values['holdings']:
 			if position['account_number'] == 'All':
 				continue
 
 			portfolio_id = map_holding_to_portfolio_id(position['account_name'])
-			custodian_account = 'BOCHK'
-			row = [portfolio_id, custodian_account]
+			row = [portfolio_id, 'BOCHK']
 
-			populate_investment_ids(portfolio_id, position)
+			investment_ids = get_investment_Ids(portfolio_id, position['security_id_type'], 
+												position['security_id'])
+			for id in investment_ids:
+				row.append(id)
+			# populate_investment_ids(portfolio_id, position)
 			for fld in fields:
 
 				if fld == 'statement_date':

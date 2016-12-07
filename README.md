@@ -22,6 +22,17 @@ Todo
 ++++++++++
 1. The investment lookup function, is repeated with other projects, like trade_converter and jpm, consider move this part to an independant project, so we can centralize lookup and checking.
 
+2. Validate a position's holding quantity after each position read.
+
+3. Add an bloomberg_figi column to the output, this is needed when a security without ISIN code is in both a HTM portfolio (uses geneva_investment_id) and a trading portfolio (uses bloomberg_figi). Is there any HTM portfolio in JPM?
+
+
+
+++++++++++
+ver 0.16
+++++++++++
+1. Move investment id lookup and portfolio accounting lookup functions to another project investment_lookup, so that we have centralized control on these settings.
+
 
 
 ++++++++++

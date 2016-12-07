@@ -10,8 +10,7 @@ from bochk.open_bochk import holdings_field_begins, read_holdings_fields, initia
                                 read_position_holding_detail, read_position_sub_total, \
                                 read_position_available_balance, read_position, \
                                 validate_position, is_grand_total, read_grand_total, \
-                                read_holdings, read_holdings_bochk, populate_investment_ids, \
-                                initialize_investment_lookup
+                                read_holdings, read_holdings_bochk
 
 
 
@@ -241,54 +240,54 @@ class TestBOCHK(unittest2.TestCase):
 
 
 
-    def test_populate_investment_ids(self):
-        lookup_file = '\\samples\\sample_investmentLookup.xls'
-        initialize_investment_lookup(lookup_file)
-        position = {}
-        position['security_id_type'] = 'ISIN'
-        position['security_id'] = 'xyz'
-        portfolio_id = '21815'    # Trading
-        populate_investment_ids(portfolio_id, position)
-        self.assertEqual(position['isin'], 'xyz')
-        self.assertTrue('geneva_investment_id' not in position and \
-                        'bloomberg_figi' not in position)
+    # def test_populate_investment_ids(self):
+    #     lookup_file = '\\samples\\sample_investmentLookup.xls'
+    #     initialize_investment_lookup(lookup_file)
+    #     position = {}
+    #     position['security_id_type'] = 'ISIN'
+    #     position['security_id'] = 'xyz'
+    #     portfolio_id = '21815'    # Trading
+    #     populate_investment_ids(portfolio_id, position)
+    #     self.assertEqual(position['isin'], 'xyz')
+    #     self.assertTrue('geneva_investment_id' not in position and \
+    #                     'bloomberg_figi' not in position)
 
-        position = {}
-        position['security_id_type'] = 'ISIN'
-        position['security_id'] = 'xyz'
-        position['quantity_type'] = 'FAMT'
-        portfolio_id = '12229'    # HTM
-        populate_investment_ids(portfolio_id, position)
-        self.assertEqual(position['geneva_investment_id'], 'xyz HTM')
-        self.assertTrue('isin' not in position and \
-                        'bloomberg_figi' not in position)
+    #     position = {}
+    #     position['security_id_type'] = 'ISIN'
+    #     position['security_id'] = 'xyz'
+    #     position['quantity_type'] = 'FAMT'
+    #     portfolio_id = '12229'    # HTM
+    #     populate_investment_ids(portfolio_id, position)
+    #     self.assertEqual(position['geneva_investment_id'], 'xyz HTM')
+    #     self.assertTrue('isin' not in position and \
+    #                     'bloomberg_figi' not in position)
 
-        position = {}
-        position['security_id_type'] = 'CMU'
-        position['security_id'] = 'HSBCFN13014'
-        portfolio_id = '21815'    # Trading
-        populate_investment_ids(portfolio_id, position)
-        self.assertEqual(position['isin'], 'HK0000163607')
-        self.assertEqual(position['bloomberg_figi'], '')
-        self.assertTrue('geneva_investment_id' not in position)
+    #     position = {}
+    #     position['security_id_type'] = 'CMU'
+    #     position['security_id'] = 'HSBCFN13014'
+    #     portfolio_id = '21815'    # Trading
+    #     populate_investment_ids(portfolio_id, position)
+    #     self.assertEqual(position['isin'], 'HK0000163607')
+    #     self.assertEqual(position['bloomberg_figi'], '')
+    #     self.assertTrue('geneva_investment_id' not in position)
 
-        position = {}
-        position['security_id_type'] = 'CMU'
-        position['security_id'] = 'HSBCFN13014'
-        portfolio_id = '12229'    # HTM
-        populate_investment_ids(portfolio_id, position)
-        self.assertEqual(position['geneva_investment_id'], 'HK0000163607 HTM')
-        self.assertTrue('bloomberg_figi' not in position and \
-                        'isin' not in position)
+    #     position = {}
+    #     position['security_id_type'] = 'CMU'
+    #     position['security_id'] = 'HSBCFN13014'
+    #     portfolio_id = '12229'    # HTM
+    #     populate_investment_ids(portfolio_id, position)
+    #     self.assertEqual(position['geneva_investment_id'], 'HK0000163607 HTM')
+    #     self.assertTrue('bloomberg_figi' not in position and \
+    #                     'isin' not in position)
 
-        position = {}
-        position['security_id_type'] = 'CMU'
-        position['security_id'] = 'WLHKFN09007'
-        portfolio_id = '12229'    # HTM
-        populate_investment_ids(portfolio_id, position)
-        self.assertEqual(position['geneva_investment_id'], 'CMU_WLHKFN09007 HTM')
-        self.assertTrue('bloomberg_figi' not in position and \
-                        'isin' not in position)
+    #     position = {}
+    #     position['security_id_type'] = 'CMU'
+    #     position['security_id'] = 'WLHKFN09007'
+    #     portfolio_id = '12229'    # HTM
+    #     populate_investment_ids(portfolio_id, position)
+    #     self.assertEqual(position['geneva_investment_id'], 'CMU_WLHKFN09007 HTM')
+    #     self.assertTrue('bloomberg_figi' not in position and \
+    #                     'isin' not in position)
 
 
 
