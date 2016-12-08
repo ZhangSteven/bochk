@@ -7,7 +7,7 @@ from datetime import datetime
 from xlrd import open_workbook
 from bochk.utility import get_current_path
 from bochk.open_bochk import read_cash_fields, read_cash_line, read_cash_bochk, \
-                                read_holdings_bochk, get_cash_date_as_string
+                                read_holdings_bochk
 
 
 
@@ -44,7 +44,7 @@ class TestBOCHKCash(unittest2.TestCase):
         """
         Read the date
         """
-        ws = self.get_worksheet('\\samples\\sample_cash2.xls')
+        ws = self.get_worksheet('\\samples\\sample_cash2 _ 16112016.xls')
         row = 0
 
         cell_value = ws.cell_value(row, 0)
@@ -66,7 +66,7 @@ class TestBOCHKCash(unittest2.TestCase):
         """
         Read the date
         """
-        ws = self.get_worksheet('\\samples\\sample_cash2.xls')
+        ws = self.get_worksheet('\\samples\\sample_cash2 _ 16112016.xls')
         row = 0
         port_values = {}
     
@@ -91,7 +91,7 @@ class TestBOCHKCash(unittest2.TestCase):
         """
         Read the date
         """
-        ws = self.get_worksheet('\\samples\\sample_cash1.xls')
+        ws = self.get_worksheet('\\samples\\sample_cash1 _ 16112016.xls')
         row = 0
         port_values = {}
     
@@ -113,7 +113,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
 
     def test_read_cash_bochk1(self):
-        filename = get_current_path() + '\\samples\\sample_cash1.xls'
+        filename = get_current_path() + '\\samples\\sample_cash1 _ 16112016.xls'
         port_values = {}
         read_cash_bochk(filename, port_values)
         cash_entries = port_values['cash']
@@ -123,7 +123,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
 
     def test_read_cash_bochk2(self):
-        filename = get_current_path() + '\\samples\\sample_cash2.xls'
+        filename = get_current_path() + '\\samples\\sample_cash2 _ 16112016.xls'
         port_values = {}
         read_cash_bochk(filename, port_values)
         cash_entries = port_values['cash']
@@ -132,45 +132,9 @@ class TestBOCHKCash(unittest2.TestCase):
 
 
 
-    def test_get_cash_date_as_string(self):
-        cash_file = get_current_path() + '\\samples\\sample_cash2.xls'
-        holdings_file = get_current_path() + '\\samples\\sample_holdings2.xls'
-        port_values = {}
-        read_cash_bochk(cash_file, port_values)
-        read_holdings_bochk(holdings_file, port_values)
-        cash_entry = port_values['cash'][0]
-        d = get_cash_date_as_string(port_values, cash_entry)
-        self.assertEqual(d, '2016-11-16')
-
-
-
-    def test_get_cash_date_as_string2(self):
-        cash_file = get_current_path() + '\\samples\\sample_holdings5_cash.xls'
-        holdings_file = get_current_path() + '\\samples\\sample_holdings5.xls'
-        port_values = {}
-        read_cash_bochk(cash_file, port_values)
-        read_holdings_bochk(holdings_file, port_values)
-        cash_entry = port_values['cash'][0]
-        d = get_cash_date_as_string(port_values, cash_entry)
-        self.assertEqual(d, '2016-7-6')
-
-
-
-    def test_get_cash_date_as_string3(self):
-        cash_file = get_current_path() + '\\samples\\sample_holdings4_cash.xls'
-        holdings_file = get_current_path() + '\\samples\\sample_holdings4.xls'
-        port_values = {}
-        read_cash_bochk(cash_file, port_values)
-        read_holdings_bochk(holdings_file, port_values)
-        cash_entry = port_values['cash'][0]
-        d = get_cash_date_as_string(port_values, cash_entry)
-        self.assertEqual(d, '2016-7-6')
-
-
-
     def verify_cash1(self, cash_entries, cash_transactions):
         """
-        For sample_cash1.xls
+        For sample_cash1 _ 16112016.xls
         """
         self.assertEqual(len(cash_entries), 3)
         for entry in cash_entries:
@@ -186,7 +150,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
     def verify_cash2(self, cash_entries, cash_transactions):
         """
-        For sample_cash2.xls
+        For sample_cash2 _ 16112016.xls
         """
         self.assertEqual(len(cash_entries), 3)
         for entry in cash_entries:
@@ -201,7 +165,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
     def verify_cash_entry1(self, cash_entry):
         """
-        The first entry in sample_cash2.xls
+        The first entry in sample_cash2 _ 16112016.xls
         """
         self.assertEqual(len(cash_entry), 8)
         self.assertEqual(cash_entry['Account Name'], 'MAPLES TRUSTEE SERV (CY) LTD-CHINA LIFE FRANKLIN TT-CONCORD FOCUS INV')
@@ -213,7 +177,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
     def verify_cash_entry2(self, cash_entry):
         """
-        The last (3rd) entry in sample_cash2.xls
+        The last (3rd) entry in sample_cash2 _ 16112016.xls
         """
         self.assertEqual(len(cash_entry), 8)
         self.assertEqual(cash_entry['Account Name'], 'MAPLES TRUSTEE SERV (CY) LTD-CHINA LIFE FRANKLIN TT-CONCORD FOCUS INV')
@@ -225,7 +189,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
     def verify_cash_entry01(self, cash_entry):
         """
-        The first entry in sample_cash1.xls
+        The first entry in sample_cash1 _ 16112016.xls
         """
         self.assertEqual(len(cash_entry), 8)
         self.assertEqual(cash_entry['Account Name'], 'MAPLES TRUSTEE SERV (CY) LTD-CHINA LIFE FRANKLIN TT-CONCORD FOCUS INV')
@@ -237,7 +201,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
     def verify_cash_entry02(self, cash_entry):
         """
-        The last (5th) entry in sample_cash1.xls
+        The last (5th) entry in sample_cash1 _ 16112016.xls
         """
         self.assertEqual(len(cash_entry), 9)
         self.assertEqual(cash_entry['Account Number'], '\'01287508062518')
@@ -250,7 +214,7 @@ class TestBOCHKCash(unittest2.TestCase):
 
     def verify_cash_transaction02(self, cash_transaction):
         """
-        from the last (5th) entry in sample_cash1.xls
+        from the last (5th) entry in sample_cash1 _ 16112016.xls
         """
         self.assertEqual(len(cash_transaction), 12)
         self.assertEqual(cash_transaction['Account Name'], 'MAPLES TRUSTEE SERV (CY) LTD-CHINA LIFE FRANKLIN TT-CONCORD FOCUS INV')

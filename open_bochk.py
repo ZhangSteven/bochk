@@ -7,16 +7,21 @@
 from xlrd import open_workbook
 from xlrd.xldate import xldate_as_datetime
 import csv, argparse, os, sys
+from datetime import datetime
 from bochk.utility import logger, get_datemode, get_current_path, \
 							get_input_directory
 from investment_lookup.id_lookup import get_investment_Ids
 
 
+
+class UnhandledFileName(Exception):
+	pass
+
 class UnhandledPosition(Exception):
 	pass
 
-class PortfolioIdNotFound(Exception):
-	pass
+# class PortfolioIdNotFound(Exception):
+# 	pass
 
 class InvalidCashAccountName(Exception):
 	pass
@@ -53,6 +58,7 @@ class InconsistentPositionGrandTotal(Exception):
 def read_holdings_bochk(filename, port_values):
 
 	logger.debug('in read_holdings_bochk()')
+	port_values['holding_date'] = retrieve_date_from_filename(filename)
 
 	wb = open_workbook(filename=filename)
 	ws = wb.sheet_by_index(0)
@@ -73,6 +79,7 @@ def read_holdings_bochk(filename, port_values):
 def read_cash_bochk(filename, port_values):
 
 	logger.debug('in read_cash_bochk()')
+	port_values['cash_date'] = retrieve_date_from_filename(filename)
 
 	wb = open_workbook(filename=filename)
 	ws = wb.sheet_by_index(0)
@@ -88,6 +95,33 @@ def read_cash_bochk(filename, port_values):
 	read_cash(ws, row+1, fields, port_values)
 
 	logger.debug('out of read_cash_bochk()')
+
+
+
+def retrieve_date_from_filename(filename):
+	"""
+	The BOCHK cash and position filenames are of the following format:
+
+	Cash _ ddmmyyyy.xls
+	Holding _ ddmmyyyy.xls
+
+	Get the date out of it.
+	"""
+	filename = filename.split('\\')[-1]	# remove the path if any
+	filename = filename.split('.')[0]	# remove the .xls suffix
+	date_string = filename.split()[-1]
+	try:
+		year = int(date_string[-4:])
+		month = int(date_string[2:4])
+		day = int(date_string[0:2])
+		d = datetime(year, month, day)
+	except:
+		logger.exception('retrieve_date_from_filename():')
+		logger.error('retrieve_date_from_filename(): failed to get date from {0}'.
+						format(filename))
+		raise UnhandledFileName
+
+	return d
 
 
 
@@ -618,23 +652,23 @@ def map_holding_to_portfolio_id(holding_account_name):
 
 
 
-def get_cash_date_as_string(port_values, cash_entry):
-	"""
-	For BOCHK, there is no date information in the cash file,
-	so we lookup the date in the corresponding holdings. In this
-	case, we assume the holdings file and the cash file are generated
-	on the same day.
-	"""
-	logger.warning('get_cash_date_as_string(): Using holdings date to represent cash date.')
-	holdings = port_values['holdings']
-	for position in holdings:
-		if map_holding_to_portfolio_id(position['account_name']) == \
-						map_cash_to_portfolio_id(cash_entry['Account Name']):
-			return convert_datetime_to_string(position['statement_date'])
+# def get_cash_date_as_string(port_values, cash_entry):
+# 	"""
+# 	For BOCHK, there is no date information in the cash file,
+# 	so we lookup the date in the corresponding holdings. In this
+# 	case, we assume the holdings file and the cash file are generated
+# 	on the same day.
+# 	"""
+# 	logger.warning('get_cash_date_as_string(): Using holdings date to represent cash date.')
+# 	holdings = port_values['holdings']
+# 	for position in holdings:
+# 		if map_holding_to_portfolio_id(position['account_name']) == \
+# 						map_cash_to_portfolio_id(cash_entry['Account Name']):
+# 			return convert_datetime_to_string(position['statement_date'])
 
-	logger.error('get_cash_date_as_string(): could not find a portfolio id for cash account:{0}'.
-					format(cash_entry['Account Name']))
-	raise PortfolioIdNotFound()
+# 	logger.error('get_cash_date_as_string(): could not find a portfolio id for cash account:{0}'.
+# 					format(cash_entry['Account Name']))
+# 	raise PortfolioIdNotFound()
 
 
 
@@ -646,30 +680,44 @@ def convert_datetime_to_string(dt):
 
 
 
+def create_csv_file_name(date, directory, file_suffix):
+	"""
+	Create the output csv file name based on the date string, as well as
+	the file suffix: cash, afs_positions, or htm_positions
+	"""
+	date_string = convert_datetime_to_string(date)
+	csv_file = directory + '\\BOCHK_' + date_string + '_' \
+				+ file_suffix + '.csv'
+	return csv_file
+
+
+
 def write_csv(port_values, directory=get_input_directory()):
 	"""
 	Write cash and holdings into csv files.
 	"""	
-	cash_file = directory + '\\cash.csv'
-	write_cash_csv(cash_file, port_values)
+	# cash_file = directory + '\\cash.csv'
+	write_cash_csv(port_values, directory)
 
-	holding_file = directory + '\\holding.csv'
-	write_holding_csv(holding_file, port_values)
+	# holding_file = directory + '\\holding.csv'
+	write_holding_csv(port_values, directory)
 
 
 
-def write_cash_csv(cash_file, port_values):
+def write_cash_csv(port_values, directory):
+	cash_file = create_csv_file_name(port_values['cash_date'], directory, 'cash')
 	with open(cash_file, 'w', newline='') as csvfile:
 		logger.debug('write_cash_csv(): {0}'.format(cash_file))
-		file_writer = csv.writer(csvfile)
+		file_writer = csv.writer(csvfile, delimiter='|')
 
 		fields = ['Account Number', 'Currency', 'Balance', 'Current Available Balance']
-		file_writer.writerow(['Portfolio', 'Date'] + fields)
+		file_writer.writerow(['Portfolio', 'Date', 'Custodian'] + fields)
 
 		for entry in port_values['cash']:
-			portfolio_date = get_cash_date_as_string(port_values, entry)
+			# portfolio_date = get_cash_date_as_string(port_values, entry)
+			cash_date = convert_datetime_to_string(port_values['cash_date'])
 			portfolio_id = map_cash_to_portfolio_id(entry['Account Name'])
-			row = [portfolio_id, portfolio_date]
+			row = [portfolio_id, cash_date, 'BOCHK']
 
 			for fld in fields:
 				if fld == 'Balance':
@@ -687,12 +735,13 @@ def write_cash_csv(cash_file, port_values):
 
 
 
-def write_holding_csv(holding_file, port_values):
+def write_holding_csv(port_values, directory):
+	holding_file = create_csv_file_name(port_values['holding_date'], directory, 'position')
 	with open(holding_file, 'w', newline='') as csvfile:
 		logger.debug('write_holding_csv(): {0}'.format(holding_file))
-		file_writer = csv.writer(csvfile)
+		file_writer = csv.writer(csvfile, delimiter='|')
 
-		fields = ['statement_date', 'market_code', 'market_name', 'security_name', 
+		fields = ['market_code', 'market_name', 'security_name', 
 					'quantity_type', 'settled_units', 'pending_receipt', 
 					'pending_delivery','sub_total', 'available_balance', 
 					'market_price_currency', 'market_price', 'market_value', 
@@ -700,7 +749,7 @@ def write_holding_csv(holding_file, port_values):
 					'equivalent_market_value']
 
 		file_writer.writerow(['portfolio', 'custodian_account', 'geneva_investment_id',
-								'isin', 'bloomberg_figi'] + fields)
+								'isin', 'bloomberg_figi', 'date'] + fields)
 
 		for position in port_values['holdings']:
 			if position['account_number'] == 'All':
@@ -713,16 +762,15 @@ def write_holding_csv(holding_file, port_values):
 												position['security_id'])
 			for id in investment_ids:
 				row.append(id)
-			# populate_investment_ids(portfolio_id, position)
+
+			row.append(convert_datetime_to_string(port_values['holding_date']))
+
 			for fld in fields:
 
-				if fld == 'statement_date':
-					item = convert_datetime_to_string(position[fld])
-				else:
-					try:
-						item = position[fld]
-					except KeyError:
-						item = ''
+				try:
+					item = position[fld]
+				except KeyError:
+					item = ''
 
 				row.append(item)
 			# end of inner for

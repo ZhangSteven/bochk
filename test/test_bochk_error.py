@@ -38,7 +38,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_err(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error _ 16112016.xls'
         port_values = {}
         with self.assertRaises(InvalidFieldName):
             read_holdings_bochk(filename, port_values)
@@ -46,7 +46,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_err2(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error2.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error2 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(TypeError):
             read_holdings_bochk(filename, port_values)
@@ -54,7 +54,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_err3(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error3.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error3 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(InvalidHoldingType):
             read_holdings_bochk(filename, port_values)
@@ -62,7 +62,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_err4(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error4.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error4 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(TypeError):
             read_holdings_bochk(filename, port_values)
@@ -70,7 +70,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_err5(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error5.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error5 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(TypeError):
             read_holdings_bochk(filename, port_values)
@@ -78,7 +78,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_err6(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error6.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error6 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(TypeError):
             read_holdings_bochk(filename, port_values)
@@ -86,7 +86,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_err7(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error7.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error7 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(InconsistentPosition):
             read_holdings_bochk(filename, port_values)
@@ -94,7 +94,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_err8(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error8.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error8 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(InconsistentPosition):
             read_holdings_bochk(filename, port_values)
@@ -102,7 +102,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_err9(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error9.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error9 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(InconsistentPositionFieldsTotal):
             read_holdings_bochk(filename, port_values)
@@ -110,7 +110,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_err10(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error10.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error10 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(InconsistentPositionGrandTotal):
             read_holdings_bochk(filename, port_values)
@@ -118,7 +118,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_cash_error1(self):
-        filename = get_current_path() + '\\samples\\cash_error.xls'
+        filename = get_current_path() + '\\samples\\cash_error _ 16112016.xls'
         port_values = {}
         with self.assertRaises(InvalidCashEntry):
             read_cash_bochk(filename, port_values)
@@ -126,7 +126,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_cash_error2(self):
-        filename = get_current_path() + '\\samples\\cash_error2.xls'
+        filename = get_current_path() + '\\samples\\cash_error2 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(InvalidCashTransaction):
             read_cash_bochk(filename, port_values)
@@ -134,7 +134,7 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_cash_error3(self):
-        filename = get_current_path() + '\\samples\\cash_error3.xls'
+        filename = get_current_path() + '\\samples\\cash_error3 _ 16112016.xls'
         port_values = {}
         with self.assertRaises(InvalidCashTransaction):
             read_cash_bochk(filename, port_values)
@@ -142,8 +142,8 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_cash_error4(self):
-        holdings_file = get_current_path() + '\\samples\\sample_holdings2.xls'
-        cash_file = get_current_path() + '\\samples\\cash_error4.xls'
+        holdings_file = get_current_path() + '\\samples\\sample_holdings2 _ 16112016.xls'
+        cash_file = get_current_path() + '\\samples\\cash_error4 _ 16112016.xls'
         port_values = {}
         directory = get_current_path() + '\\samples'
         read_cash_bochk(cash_file, port_values)
@@ -167,10 +167,10 @@ class TestBOCHKError(unittest2.TestCase):
 
 
     def test_output_error(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error11.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings_error11 _ 16112016.xls'
         port_values = {}
         read_holdings_bochk(filename, port_values)
-        holding_file = get_current_path() + '\\samples\\holding.csv'
+        directory = get_current_path() + '\\samples'
     
         with self.assertRaises(InvestmentIdNotFound):
-            write_holding_csv(holding_file, port_values)
+            write_holding_csv(port_values, directory)

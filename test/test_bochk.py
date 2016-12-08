@@ -10,7 +10,8 @@ from bochk.open_bochk import holdings_field_begins, read_holdings_fields, initia
                                 read_position_holding_detail, read_position_sub_total, \
                                 read_position_available_balance, read_position, \
                                 validate_position, is_grand_total, read_grand_total, \
-                                read_holdings, read_holdings_bochk
+                                read_holdings, read_holdings_bochk, retrieve_date_from_filename, \
+                                UnhandledFileName, read_cash_bochk
 
 
 
@@ -43,19 +44,46 @@ class TestBOCHK(unittest2.TestCase):
 
 
 
+    def test_retrieve_date_from_filename(self):
+        filename = 'C:\\Users\\steven.zhang\\Desktop\\data conversion\\Overseas Bond\\Holding _ 15112016.xls'
+        d = retrieve_date_from_filename(filename)
+        self.assertEqual(d, datetime(2016,11,15))
+
+        filename = 'C:\\Users\\steven.zhang\\Desktop\\data conversion\\Overseas Bond\\Cash _ 11072016.xls'
+        d = retrieve_date_from_filename(filename)
+        self.assertEqual(d, datetime(2016,7,11))
+
+        filename = 'C:\\Users\\steven.zhang\\Desktop\\data conversion\\Overseas Bond\\Cash _ 1172016.xls'
+        with self.assertRaises(UnhandledFileName):
+            retrieve_date_from_filename(filename)
+
+
+
+    def test_get_date_from_file(self):
+        cash_file = get_current_path() + '\\samples\\Cash _ 15112016.xls'
+        holdings_file = get_current_path() + '\\samples\\Holding _ 12072016.xls'
+        port_values = {}
+        read_cash_bochk(cash_file, port_values)
+        read_holdings_bochk(holdings_file, port_values)
+        self.assertEqual(datetime(2016,11,15), port_values['cash_date'])
+        self.assertEqual(datetime(2016,7,12), port_values['holding_date'])
+
+
+
     def test_holdings_field_begins(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings2.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings2 _ 16112016.xls')
         row = 0
         self.assertFalse(holdings_field_begins(ws, row))
         row = 2
         self.assertTrue(holdings_field_begins(ws, row))
 
 
+
     def test_read_holdings_fields(self):
         """
         Read the date
         """
-        ws = self.get_worksheet('\\samples\\sample_holdings2.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings2 _ 16112016.xls')
         row = 0
 
         while not holdings_field_begins(ws, row):
@@ -70,7 +98,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_read_position_holding_detail(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings2.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings2 _ 16112016.xls')
         fields = read_holdings_fields(ws, 2)
 
         position = {}
@@ -87,7 +115,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_read_position_holding_detail2(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings3.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings3 _ 16112016.xls')
         fields = read_holdings_fields(ws, 2)
 
         position = {}
@@ -106,7 +134,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_read_position_sub_total(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings2.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings2 _ 16112016.xls')
         fields = read_holdings_fields(ws, 2)
 
         # read a normal position
@@ -123,7 +151,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_read_position_sub_total2(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings4.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings4 _ 06072016.xls')
         fields = read_holdings_fields(ws, 2)
 
         # read an All section position
@@ -140,7 +168,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_read_position_available_balance(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings3.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings3 _ 16112016.xls')
         fields = read_holdings_fields(ws, 2)
 
         position = {}
@@ -150,7 +178,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_read_position(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings3.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings3 _ 16112016.xls')
         fields = read_holdings_fields(ws, 2)
 
         position = {}
@@ -166,7 +194,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_validate_position(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings3.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings3 _ 16112016.xls')
         fields = read_holdings_fields(ws, 2)
 
         position = {}
@@ -186,7 +214,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_grand_total(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings1.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings1 _ 10072016.xls')
         fields = read_holdings_fields(ws, 2)
 
         self.assertTrue(is_grand_total(ws, 93))
@@ -199,7 +227,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_read_holdings(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings2.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings2 _ 16112016.xls')
         fields = read_holdings_fields(ws, 2)
         port_values = {}
         try:
@@ -212,7 +240,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_read_holdings2(self):
-        ws = self.get_worksheet('\\samples\\sample_holdings4.xls')
+        ws = self.get_worksheet('\\samples\\sample_holdings4 _ 06072016.xls')
         fields = read_holdings_fields(ws, 2)
         port_values = {}
         try:
@@ -225,7 +253,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_read_holdings_bochk(self):
-        filename = get_current_path() + '\\samples\\sample_holdings2.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings2 _ 16112016.xls'
         port_values = {}
         read_holdings_bochk(filename, port_values)
         self.verify_holdings(port_values['holdings'])
@@ -233,7 +261,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_read_holdings_bochk2(self):
-        filename = get_current_path() + '\\samples\\sample_holdings4.xls'
+        filename = get_current_path() + '\\samples\\sample_holdings4 _ 06072016.xls'
         port_values = {}
         read_holdings_bochk(filename, port_values)
         self.verify_holdings2(port_values['holdings'])
@@ -312,7 +340,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def validate_position_fields_All_section(self, position):
         """
-        Fields in a position in All section, see samples/sample_holdings4.xls
+        Fields in a position in All section, see samples/sample_holdings4 _ 06072016.xls
         """
         fields = ['generation_date', 'statement_date', 'account_name',
                     'account_number', 'market_code', 'market_name',
@@ -329,7 +357,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def verify_holdings(self, holdings):
         """
-        For samples/sample_holdings2.xls
+        For samples/sample_holdings2 _ 16112016.xls
         """
         self.assertEqual(len(holdings), 27)
         self.validate_position1(holdings[0])
@@ -340,7 +368,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def verify_holdings2(self, holdings):
         """
-        For samples/sample_holdings4.xls
+        For samples/sample_holdings4 _ 06072016.xls
         """
         self.assertEqual(len(holdings), 284)
         self.validate_position01(holdings[0])
@@ -351,7 +379,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def validate_position1(self, position):
         """
-        For first position in samples/sample_holdings2.xls
+        For first position in samples/sample_holdings2 _ 16112016.xls
         """
         self.validate_position_fields(position)
         self.assertEqual(position['statement_date'], datetime(2016,11,16))
@@ -366,7 +394,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def validate_position2(self, position):
         """
-        For the 18th position in samples/sample_holdings2.xls
+        For the 18th position in samples/sample_holdings2 _ 16112016.xls
         """
         self.validate_position_fields(position)
         self.assertEqual(position['statement_date'], datetime(2016,11,16))
@@ -381,7 +409,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def validate_position3(self, position):
         """
-        For the last (27th) position in samples/sample_holdings2.xls
+        For the last (27th) position in samples/sample_holdings2 _ 16112016.xls
         """
         self.validate_position_fields(position)
         self.assertEqual(position['statement_date'], datetime(2016,11,16))
@@ -397,7 +425,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def validate_position01(self, position):
         """
-        For first position in samples/sample_holdings4.xls
+        For first position in samples/sample_holdings4 _ 06072016.xls
         """
         self.validate_position_fields(position)
         self.assertEqual(position['generation_date'], datetime(2016,7,7))
@@ -412,7 +440,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def validate_position02(self, position):
         """
-        For the last(199th) holding position in samples/sample_holdings4.xls
+        For the last(199th) holding position in samples/sample_holdings4 _ 06072016.xls
         """
         self.validate_position_fields(position)
         self.assertEqual(position['statement_date'], datetime(2016,7,6))
@@ -429,7 +457,7 @@ class TestBOCHK(unittest2.TestCase):
 
     def validate_position03(self, position):
         """
-        For the last (283th) position in All section, in samples/sample_holdings4.xls
+        For the last (283th) position in All section, in samples/sample_holdings4 _ 06072016.xls
         """
         self.validate_position_fields_All_section(position)
         self.assertEqual(position['statement_date'], datetime(2016,7,6))

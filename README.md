@@ -29,6 +29,17 @@ Todo
 
 
 ++++++++++
+ver 0.17
+++++++++++
+1. Bug fix: the date of the position should be extracted from the file name instead of the 'statement_date' in the positions. Because the latter means the date when the statement has been generated.
+
+2. Change the output csv to use '|' as delimiter, to avoid potential problem due to data field such as "security name" containing commas.
+
+3. Add date to the output csv file name.
+
+
+
+++++++++++
 ver 0.16
 ++++++++++
 1. Move investment id lookup and portfolio accounting lookup functions to another project investment_lookup, so that we have centralized control on these settings.
