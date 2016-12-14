@@ -29,6 +29,21 @@ Todo
 
 
 ++++++++++
+ver 0.18
+++++++++++
+1. Now output csv file name depends on the input directory, the mapping is as follows (directory case insensitive):
+
+	directory 	: file name prefix
+	
+	Concord		: 21815_*.csv
+	Greenblue	: 11602_*.csv
+	CLO bond    : clo_bond_*.csv
+	Special Event Fund: 16454_*.csv
+	in-house Fund : 88888_*.csv
+
+
+
+++++++++++
 ver 0.17
 ++++++++++
 1. Bug fix: the date of the position should be extracted from the file name instead of the 'statement_date' in the positions. Because the latter means the date when the statement has been generated.
