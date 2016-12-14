@@ -20,11 +20,15 @@ Note
 ++++++++++
 Todo
 ++++++++++
-1. The investment lookup function, is repeated with other projects, like trade_converter and jpm, consider move this part to an independant project, so we can centralize lookup and checking.
 
-2. Validate a position's holding quantity after each position read.
+1. Validate a position's holding quantity after each position read.
 
-3. Add an bloomberg_figi column to the output, this is needed when a security without ISIN code is in both a HTM portfolio (uses geneva_investment_id) and a trading portfolio (uses bloomberg_figi). Is there any HTM portfolio in JPM?
+
+
+++++++++++
+ver 0.19
+++++++++++
+1. Now output csv file name solely depends on the input directory folder name, and it will always contain "bochk", e.g, input path is C:\...\concord, then output csv file will be "concord_bochk_*.csv".
 
 
 

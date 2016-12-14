@@ -680,23 +680,36 @@ def convert_datetime_to_string(dt):
 
 
 
+# def get_prefix_from_dir(input_dir):
+# 	"""
+# 	Work out a prefix for the filename depending on the input directory.
+# 	"""
+# 	token = input_dir.split('\\')[-1]
+# 	if token.lower() == 'concord':
+# 		return '21815'
+# 	elif token.lower() == 'greenblue':
+# 		return '11602'
+# 	elif token.lower() == 'special event fund':
+# 		return '16454'
+# 	elif token.lower() == 'in-house fund':
+# 		return '88888'
+# 	elif token.lower() == 'clo bond':
+# 		return 'clo_bond'
+# 	else:
+# 		return 'bochk'
+
+
+
 def get_prefix_from_dir(input_dir):
 	"""
 	Work out a prefix for the filename depending on the input directory.
 	"""
-	token = input_dir.split('\\')[-1]
-	if token.lower() == 'concord':
-		return '21815'
-	elif token.lower() == 'greenblue':
-		return '11602'
-	elif token.lower() == 'special event fund':
-		return '16454'
-	elif token.lower() == 'in-house fund':
-		return '88888'
-	elif token.lower() == 'clo bond':
-		return 'clo_bond'
-	else:
-		return 'bochk'
+	folder_name = input_dir.split('\\')[-1]
+	prefix = ''
+	for token in folder_name.lower().split():
+		prefix = prefix + token + '_'
+
+	return prefix + 'bochk_'
 
 
 
@@ -706,7 +719,7 @@ def create_csv_file_name(date, directory, file_suffix):
 	the file suffix: cash, afs_positions, or htm_positions
 	"""
 	date_string = convert_datetime_to_string(date)
-	csv_file = directory + '\\' + get_prefix_from_dir(directory) + '_' + \
+	csv_file = directory + '\\' + get_prefix_from_dir(directory) + \
 				date_string + '_' + file_suffix + '.csv'
 	return csv_file
 
