@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.1901
+++++++++++
+1. Change the configure file, so that input directory is for office PC, previously it was for hong kong home laptop.
+
+
+
+++++++++++
 ver 0.19
 ++++++++++
 1. Now output csv file name solely depends on the input directory folder name, and it will always contain "bochk", e.g, input path is C:\...\concord, then output csv file will be "concord_bochk_*.csv".
