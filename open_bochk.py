@@ -713,32 +713,30 @@ def get_prefix_from_dir(input_dir):
 
 
 
-def create_csv_file_name(date, directory, file_suffix):
+def create_csv_file_name(date, output_dir, file_prefix, file_suffix):
 	"""
 	Create the output csv file name based on the date string, as well as
 	the file suffix: cash, afs_positions, or htm_positions
 	"""
 	date_string = convert_datetime_to_string(date)
-	csv_file = directory + '\\' + get_prefix_from_dir(directory) + \
-				date_string + '_' + file_suffix + '.csv'
+	csv_file = output_dir + '\\' + file_prefix + date_string + '_' \
+				+ file_suffix + '.csv'
 	return csv_file
 
 
 
-def write_csv(port_values, directory=get_input_directory()):
+def write_csv(port_values, directory=get_input_directory(),
+				file_prefix=get_prefix_from_dir(get_input_directory())):
 	"""
 	Write cash and holdings into csv files.
 	"""	
-	# cash_file = directory + '\\cash.csv'
-	write_cash_csv(port_values, directory)
-
-	# holding_file = directory + '\\holding.csv'
-	write_holding_csv(port_values, directory)
+	write_cash_csv(port_values, directory, file_prefix)
+	write_holding_csv(port_values, directory, file_prefix)
 
 
 
-def write_cash_csv(port_values, directory):
-	cash_file = create_csv_file_name(port_values['cash_date'], directory, 'cash')
+def write_cash_csv(port_values, directory, file_prefix):
+	cash_file = create_csv_file_name(port_values['cash_date'], directory, file_prefix, 'cash')
 	with open(cash_file, 'w', newline='') as csvfile:
 		logger.debug('write_cash_csv(): {0}'.format(cash_file))
 		file_writer = csv.writer(csvfile, delimiter='|')
@@ -768,8 +766,8 @@ def write_cash_csv(port_values, directory):
 
 
 
-def write_holding_csv(port_values, directory):
-	holding_file = create_csv_file_name(port_values['holding_date'], directory, 'position')
+def write_holding_csv(port_values, directory, file_prefix):
+	holding_file = create_csv_file_name(port_values['holding_date'], directory, file_prefix, 'position')
 	with open(holding_file, 'w', newline='') as csvfile:
 		logger.debug('write_holding_csv(): {0}'.format(holding_file))
 		file_writer = csv.writer(csvfile, delimiter='|')

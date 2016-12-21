@@ -5,13 +5,13 @@ Test the open_jpm.py
 import unittest2
 from datetime import datetime
 from xlrd import open_workbook
-from bochk.utility import get_current_path
+from bochk.utility import get_current_path, get_input_directory
 from bochk.open_bochk import read_holdings_bochk, InvalidFieldName, InvalidHoldingType, \
                                 InconsistentPosition, InconsistentPositionFieldsTotal, \
                                 InconsistentPositionGrandTotal, InvalidCashEntry, \
                                 InvalidCashTransaction, read_cash_bochk, read_holdings_bochk, \
                                 write_holding_csv, write_csv, UnhandledPosition, \
-                                InvalidCashAccountName
+                                InvalidCashAccountName, get_prefix_from_dir
 from investment_lookup.id_lookup import InvestmentIdNotFound
 
 
@@ -173,4 +173,5 @@ class TestBOCHKError(unittest2.TestCase):
         directory = get_current_path() + '\\samples'
     
         with self.assertRaises(InvestmentIdNotFound):
-            write_holding_csv(port_values, directory)
+            write_holding_csv(port_values, directory, \
+                                get_prefix_from_dir(get_input_directory()))

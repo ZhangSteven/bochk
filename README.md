@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.20
+++++++++++
+1. Change the write_csv(), write_cash_csv() and write_holding_csv() function, now they take an additional argument as filename prefix, to work with reconciliaiton_helper package.
+
+
+
+++++++++++
 ver 0.1901
 ++++++++++
 1. Change the configure file, so that input directory is for office PC, previously it was for hong kong home laptop.
