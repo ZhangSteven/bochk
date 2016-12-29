@@ -764,6 +764,8 @@ def write_cash_csv(port_values, directory, file_prefix):
 
 			file_writer.writerow(row)
 
+	return cash_file
+
 
 
 def write_holding_csv(port_values, directory, file_prefix):
@@ -808,6 +810,7 @@ def write_holding_csv(port_values, directory, file_prefix):
 
 			file_writer.writerow(row)
 		# end of outer for loop
+	return holding_file
 
 
 

@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.21
+++++++++++
+1. Change the write_cash_csv() and write_holding_csv() function so that they return the output csv filename (full path). This is required by the recon_helper package.
+
+
+
+++++++++++
 ver 0.20
 ++++++++++
 1. Change the write_csv(), write_cash_csv() and write_holding_csv() function, now they take an additional argument as filename prefix, to work with reconciliaiton_helper package.
