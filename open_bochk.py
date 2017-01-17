@@ -6,7 +6,7 @@
 
 from xlrd import open_workbook
 from xlrd.xldate import xldate_as_datetime
-import csv, argparse, os, sys
+import csv, argparse, os, sys, re
 from datetime import datetime
 from bochk.utility import logger, get_datemode, get_current_path, \
 							get_input_directory
@@ -52,6 +52,32 @@ class InconsistentPositionFieldsTotal(Exception):
 
 class InconsistentPositionGrandTotal(Exception):
 	pass
+
+class FileHandlerNotFound(Exception):
+	pass
+
+
+
+def read_file(filename, port_values):
+	"""
+	Read an input file, tell whether it is a holdings file or cash statement
+	file, extract date from form its filename, then call the holding file
+	or cash file handler. 
+	"""	
+	fn = filename.split('\\')[-1]	# filename without path
+	if fn.startswith('Cash'):
+		handler = read_cash_bochk
+	elif fn.startswith('Holding'):
+		handler = read_holdings_bochk
+	elif fn.startswith('BOC Broker Statement'):
+		handler = read_holdings_bochk
+	elif fn.startswith('BOC Bank Statement'):
+		handler = read_cash_bochk
+	else:
+		logger.error('read_file(): no file handler found for {0}'.format(filename))
+		raise FileHandlerNotFound
+
+	handler(filename, port_values)
 
 
 
@@ -107,21 +133,26 @@ def retrieve_date_from_filename(filename):
 
 	Get the date out of it.
 	"""
-	filename = filename.split('\\')[-1]	# remove the path if any
-	filename = filename.split('.')[0]	# remove the .xls suffix
-	date_string = filename.split()[-1]
-	try:
-		year = int(date_string[-4:])
-		month = int(date_string[2:4])
-		day = int(date_string[0:2])
-		d = datetime(year, month, day)
-	except:
-		logger.exception('retrieve_date_from_filename():')
-		logger.error('retrieve_date_from_filename(): failed to get date from {0}'.
-						format(filename))
-		raise UnhandledFileName
+	fn = filename.split('\\')[-1]	# filename without path
+	m = re.search('[0-9]{8}', fn)
+	if m != None:
+		year = int(m.group(0)[-4:])
+		month = int(m.group(0)[2:4])
+		day = int(m.group(0)[0:2])
+		return datetime(year, month, day)
 
-	return d
+	else:
+		m = re.search('[0-9]{4}-[0-9]{2}-[0-9]{2}', fn)
+
+		if m is None:
+			logger.error('retrieve_date_from_filename(): failed to get date from {0}'.
+							format(filename))
+			raise UnhandledFileName
+
+		year = int(m.group(0)[0:4])
+		month = int(m.group(0)[5:7])
+		day = int(m.group(0)[8:10])
+		return datetime(year, month, day)
 
 
 
@@ -640,6 +671,7 @@ def map_holding_to_portfolio_id(holding_account_name):
 		'CLT-CLI HK BR TRUST FUND (CAPITAL) (SUB-FUND-BOND)':'12732',
 		'CLT-CLI OVERSEAS TRUST FD (CAPITAL) (SUB-FD-BOND)':'12733',
 		'CLT-CLI MACAU BR(CLS A-MC)TRUST FD (SUB-FUND-BOND)':'12366',
+		'CLT-CLI HK BR(CLS A-HK)TRUST FD(SUB-FD-TRADING BD)':'12528',
 		'CLT-CHINA LIFE FRANKLIN CLIENTS ACCOUNT':'13456'
 	}
 
@@ -652,51 +684,11 @@ def map_holding_to_portfolio_id(holding_account_name):
 
 
 
-# def get_cash_date_as_string(port_values, cash_entry):
-# 	"""
-# 	For BOCHK, there is no date information in the cash file,
-# 	so we lookup the date in the corresponding holdings. In this
-# 	case, we assume the holdings file and the cash file are generated
-# 	on the same day.
-# 	"""
-# 	logger.warning('get_cash_date_as_string(): Using holdings date to represent cash date.')
-# 	holdings = port_values['holdings']
-# 	for position in holdings:
-# 		if map_holding_to_portfolio_id(position['account_name']) == \
-# 						map_cash_to_portfolio_id(cash_entry['Account Name']):
-# 			return convert_datetime_to_string(position['statement_date'])
-
-# 	logger.error('get_cash_date_as_string(): could not find a portfolio id for cash account:{0}'.
-# 					format(cash_entry['Account Name']))
-# 	raise PortfolioIdNotFound()
-
-
-
 def convert_datetime_to_string(dt):
 	"""
 	convert a datetime object to string in the 'yyyy-mm-dd' format.
 	"""
 	return '{0}-{1}-{2}'.format(dt.year, dt.month, dt.day)
-
-
-
-# def get_prefix_from_dir(input_dir):
-# 	"""
-# 	Work out a prefix for the filename depending on the input directory.
-# 	"""
-# 	token = input_dir.split('\\')[-1]
-# 	if token.lower() == 'concord':
-# 		return '21815'
-# 	elif token.lower() == 'greenblue':
-# 		return '11602'
-# 	elif token.lower() == 'special event fund':
-# 		return '16454'
-# 	elif token.lower() == 'in-house fund':
-# 		return '88888'
-# 	elif token.lower() == 'clo bond':
-# 		return 'clo_bond'
-# 	else:
-# 		return 'bochk'
 
 
 
@@ -730,7 +722,7 @@ def write_csv(port_values, directory=get_input_directory(),
 	"""
 	Write cash and holdings into csv files.
 	"""	
-	write_cash_csv(port_values, directory, file_prefix)
+	# write_cash_csv(port_values, directory, file_prefix)
 	write_holding_csv(port_values, directory, file_prefix)
 
 
@@ -816,28 +808,24 @@ def write_holding_csv(port_values, directory, file_prefix):
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Read cash and position files from BOC HK, then convert to Geneva format for reconciliation purpose. Check the config file for path to those files.')
-	parser.add_argument('cash_file')
-	parser.add_argument('holdings_file')
+	parser.add_argument('files', metavar='files', type=str, nargs='+',
+						help='a list of cash or holdings files to read')
 	args = parser.parse_args()
 
-
-	cash_file = get_input_directory() + '\\' + args.cash_file
-	if not os.path.exists(cash_file):
-		print('{0} does not exist'.format(cash_file))
-		sys.exit(1)
-
-	holdings_file = get_input_directory() + '\\' + args.holdings_file
-	if not os.path.exists(holdings_file):
-		print('{0} does not exist'.format(holdings_file))
-		sys.exit(1)
-
 	port_values = {}
-	try:
-		read_cash_bochk(cash_file, port_values)
-		read_holdings_bochk(holdings_file, port_values)
-		write_csv(port_values)
-	except:
-		logger.exception('open_bochk:main()')
-		print('something goes wrong, check log file.')
-	else:
-		print('OK')
+	for file in args.files:
+		file = get_input_directory() + '\\' + file
+
+		if not os.path.exists(file):
+			print('{0} does not exist'.format(file))
+			sys.exit(1)
+
+		try:
+			read_file(file, port_values)
+		except:
+			logger.exception('open_bochk:main()')
+			print('something goes wrong, check log file.')
+			sys.exit(1)
+
+	write_csv(port_values)
+	print('OK')
