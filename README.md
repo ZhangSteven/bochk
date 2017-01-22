@@ -26,6 +26,15 @@ Todo
 
 
 ++++++++++
+ver 0.22
+++++++++++
+1. Add read_file() function, it tells whether the input file is a holdings file or cash file. It then calls the read_holdings_bochk() or read_cash_bochk() functions accordingly.
+
+2. Change the write_cash_csv() and write_holding_csv() function so that they will ignore the input if the port_values does not contain cash or holdings information.
+
+
+
+++++++++++
 ver 0.21
 ++++++++++
 1. Change the write_cash_csv() and write_holding_csv() function so that they return the output csv filename (full path). This is required by the recon_helper package.

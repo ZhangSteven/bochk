@@ -61,8 +61,7 @@ class FileHandlerNotFound(Exception):
 def read_file(filename, port_values):
 	"""
 	Read an input file, tell whether it is a holdings file or cash statement
-	file, extract date from form its filename, then call the holding file
-	or cash file handler. 
+	file, call the holding file or cash file handler to handle it.
 	"""	
 	fn = filename.split('\\')[-1]	# filename without path
 	if fn.startswith('Cash'):
@@ -75,7 +74,7 @@ def read_file(filename, port_values):
 		handler = read_cash_bochk
 	else:
 		logger.error('read_file(): no file handler found for {0}'.format(filename))
-		raise FileHandlerNotFound
+		raise FileHandlerNotFound()
 
 	handler(filename, port_values)
 
@@ -722,12 +721,16 @@ def write_csv(port_values, directory=get_input_directory(),
 	"""
 	Write cash and holdings into csv files.
 	"""	
-	# write_cash_csv(port_values, directory, file_prefix)
+	write_cash_csv(port_values, directory, file_prefix)
 	write_holding_csv(port_values, directory, file_prefix)
 
 
 
 def write_cash_csv(port_values, directory, file_prefix):
+	if not 'cash' in port_values:	# do nothing
+		logger.warning('write_cash_csv(): no cash information is found.')
+		return
+
 	cash_file = create_csv_file_name(port_values['cash_date'], directory, file_prefix, 'cash')
 	with open(cash_file, 'w', newline='') as csvfile:
 		logger.debug('write_cash_csv(): {0}'.format(cash_file))
@@ -761,6 +764,10 @@ def write_cash_csv(port_values, directory, file_prefix):
 
 
 def write_holding_csv(port_values, directory, file_prefix):
+	if not 'holdings' in port_values:	# do nothing
+		logger.warning('write_holding_csv(): no holding information is found.')
+		return
+
 	holding_file = create_csv_file_name(port_values['holding_date'], directory, file_prefix, 'position')
 	with open(holding_file, 'w', newline='') as csvfile:
 		logger.debug('write_holding_csv(): {0}'.format(holding_file))
@@ -807,9 +814,24 @@ def write_holding_csv(port_values, directory, file_prefix):
 
 
 if __name__ == '__main__':
+	"""
+	Generate cash or holdings csv files on demand, use
+
+	python open_bochk.py <holding_or_cash_file>
+
+	Or,
+
+	python open_bochk.py <holding_file> <cash_file>
+
+	the order of the holding file and cash doesn't matter.
+
+	Note if you put 2 holding files or 2 cash files, it won't give you
+	an error, but the output of the latter will override the output csv
+	of the former.
+	"""
 	parser = argparse.ArgumentParser(description='Read cash and position files from BOC HK, then convert to Geneva format for reconciliation purpose. Check the config file for path to those files.')
 	parser.add_argument('files', metavar='files', type=str, nargs='+',
-						help='a list of cash or holdings files to read')
+						help='cash and/or holdings files')
 	args = parser.parse_args()
 
 	port_values = {}
@@ -822,10 +844,9 @@ if __name__ == '__main__':
 
 		try:
 			read_file(file, port_values)
+			write_csv(port_values)
+			print('OK')
 		except:
 			logger.exception('open_bochk:main()')
 			print('something goes wrong, check log file.')
 			sys.exit(1)
-
-	write_csv(port_values)
-	print('OK')
