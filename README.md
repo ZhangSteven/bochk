@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.23
+++++++++++
+1. Bug fix: when both a cash and holdings file are present on the command line, only the first file got output.
+
+
+
+++++++++++
 ver 0.22
 ++++++++++
 1. Add read_file() function, it tells whether the input file is a holdings file or cash file. It then calls the read_holdings_bochk() or read_cash_bochk() functions accordingly.

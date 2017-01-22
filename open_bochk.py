@@ -716,6 +716,19 @@ def create_csv_file_name(date, output_dir, file_prefix, file_suffix):
 
 
 
+def write_cash_or_holding_csv(port_values, directory=get_input_directory(),
+								file_prefix=get_prefix_from_dir(get_input_directory())):
+	"""
+	Write cash or holdings into csv files.
+	"""
+	output_file = write_cash_csv(port_values, directory, file_prefix)
+	if output_file is None:
+		output_file = write_holding_csv(port_values, directory, file_prefix)
+
+	return output_file
+
+
+
 def write_csv(port_values, directory=get_input_directory(),
 				file_prefix=get_prefix_from_dir(get_input_directory())):
 	"""
@@ -729,7 +742,7 @@ def write_csv(port_values, directory=get_input_directory(),
 def write_cash_csv(port_values, directory, file_prefix):
 	if not 'cash' in port_values:	# do nothing
 		logger.warning('write_cash_csv(): no cash information is found.')
-		return
+		return None
 
 	cash_file = create_csv_file_name(port_values['cash_date'], directory, file_prefix, 'cash')
 	with open(cash_file, 'w', newline='') as csvfile:
@@ -766,7 +779,7 @@ def write_cash_csv(port_values, directory, file_prefix):
 def write_holding_csv(port_values, directory, file_prefix):
 	if not 'holdings' in port_values:	# do nothing
 		logger.warning('write_holding_csv(): no holding information is found.')
-		return
+		return None
 
 	holding_file = create_csv_file_name(port_values['holding_date'], directory, file_prefix, 'position')
 	with open(holding_file, 'w', newline='') as csvfile:
@@ -834,7 +847,6 @@ if __name__ == '__main__':
 						help='cash and/or holdings files')
 	args = parser.parse_args()
 
-	port_values = {}
 	for file in args.files:
 		file = get_input_directory() + '\\' + file
 
@@ -843,8 +855,9 @@ if __name__ == '__main__':
 			sys.exit(1)
 
 		try:
+			port_values = {}
 			read_file(file, port_values)
-			write_csv(port_values)
+			write_cash_or_holding_csv(port_values)
 			print('OK')
 		except:
 			logger.exception('open_bochk:main()')
