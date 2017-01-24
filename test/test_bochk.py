@@ -53,9 +53,19 @@ class TestBOCHK(unittest2.TestCase):
         d = retrieve_date_from_filename(filename)
         self.assertEqual(d, datetime(2016,7,11))
 
+        filename = 'C:\\Users\\steven.zhang\\Desktop\\data conversion\\Overseas Bond\\BOC Broker Statement 2016-12-15.xls'
+        d = retrieve_date_from_filename(filename)
+        self.assertEqual(d, datetime(2016,12,15))
+
+        filename = 'C:\\Users\\steven.zhang\\Desktop\\data conversion\\Overseas Bond\\BOC Bank Statement 2016-12-30-31 (CLASS A-HK SUB FUND TRADING BOND) -HKD.xls'
+        d = retrieve_date_from_filename(filename)
+        self.assertEqual(d, datetime(2016,12,30))
+
         filename = 'C:\\Users\\steven.zhang\\Desktop\\data conversion\\Overseas Bond\\Cash _ 1172016.xls'
         with self.assertRaises(UnhandledFileName):
             retrieve_date_from_filename(filename)
+
+
 
 
 

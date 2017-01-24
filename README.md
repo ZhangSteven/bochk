@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.2301
+++++++++++
+1. Add one more test case for get date from file name, for file names like BOC Bank Statement 2016-01-29-30 (CLASS A-MC SUB FUND BOND) -HKD.xls
+
+
+
+++++++++++
 ver 0.23
 ++++++++++
 1. Bug fix: when both a cash and holdings file are present on the command line, only the first file got output.
