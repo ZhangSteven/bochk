@@ -24,6 +24,14 @@ Todo
 1. Validate a position's holding quantity after each position read.
 
 
+
+++++++++++
+ver 0.2401
+++++++++++
+1. Add fund name mapping "CLT-CLI HK BR (CLASS A- HK) TRUST FUND" to portfolio code '99999'. Please find out what out it actually is.
+
+
+
 ++++++++++
 ver 0.24
 ++++++++++
