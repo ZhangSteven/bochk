@@ -24,6 +24,12 @@ Todo
 1. Validate a position's holding quantity after each position read.
 
 
+++++++++++
+ver 0.24
+++++++++++
+1. Add fund name to portfolio id mapping for Greenblue.
+
+
 
 ++++++++++
 ver 0.2301
