@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.2402
+++++++++++
+1. It's found that "CLT-CLI HK BR (CLASS A- HK) TRUST FUND" in BOCHK is actually 11490's cash holding in BOCHK. So we fixed that in the map_cash_to_portfolio_id() function.
+
+
+
+++++++++++
 ver 0.2401
 ++++++++++
 1. Add fund name mapping "CLT-CLI HK BR (CLASS A- HK) TRUST FUND" to portfolio code '99999'. Please find out what out it actually is.

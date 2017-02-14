@@ -649,8 +649,8 @@ def map_cash_to_portfolio_id(cash_account_name):
 		'CLT-CHINA LIFE FRANKLIN CLIENTS ACCOUNT':'13456',
 		'MAPLES TRUSTEE SERV (CY) LTD-CHINA LIFE FRANKLIN TT-GREEN BLUE SP OP F':'11602',
 
-		# FIXME: which portfolio this maps to?
-		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND':'99999'
+		# the cash of 11490 in BOCHK
+		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND':'11490'
 	}
 
 	try:
