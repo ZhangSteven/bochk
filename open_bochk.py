@@ -9,7 +9,7 @@ from xlrd.xldate import xldate_as_datetime
 import csv, argparse, os, sys, re
 from datetime import datetime
 from bochk.utility import logger, get_datemode, get_current_path, \
-							get_input_directory
+							get_input_directory, get_exception_list
 from investment_lookup.id_lookup import get_investment_Ids
 
 
@@ -378,6 +378,7 @@ def read_position(ws, row, fields, position):
 
 	Returns the row number of next line after this position.
 	"""
+	logger.debug('read_position(): at row {0}'.format(row))
 	initialize_position(position)
 
 	i = 0
@@ -524,6 +525,10 @@ def validate_position(position):
 
 
 	if x==0 and y==0 and abs(z) < 0.01 and abs(z2) < 0.01:
+		pass
+	elif position['security_id_type']+':'+position['security_id'] in get_exception_list():
+		# if it is a bond (ABS etc.) that allows capital paydown so that market
+		# value is not the product of quantity and price.
 		pass
 	else:
 		logger.error('validate_position(): inconsistent position: market={0}, {1}={2}, settled_units={3}'.

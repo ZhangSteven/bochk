@@ -101,3 +101,12 @@ def get_input_directory():
 		directory = get_current_path()
 
 	return directory
+
+
+
+def get_exception_list():
+	"""
+	The list of bonds that allow capital paydown.
+	"""
+	global config
+	return config['bond']['exception_list']

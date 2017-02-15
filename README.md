@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.25
+++++++++++
+1. The config file is changed to add an option allowing the validate_position() function to ignore certain bonds, because they allow principle paydown so they won't satisfy the validation checks and they need to be ignored for the check.
+
+
+
+++++++++++
 ver 0.2402
 ++++++++++
 1. It's found that "CLT-CLI HK BR (CLASS A- HK) TRUST FUND" in BOCHK is actually 11490's cash holding in BOCHK. So we fixed that in the map_cash_to_portfolio_id() function.
