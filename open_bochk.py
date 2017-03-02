@@ -407,6 +407,7 @@ def initialize_position(position):
 	position['settled_units'] = 0
 	position['pending_receipt'] = 0
 	position['pending_delivery'] = 0
+	position['pending_call'] = 0
 
 
 
@@ -434,6 +435,9 @@ def read_position_holding_detail(ws, row, fields, position):
 				# print('holding type: {0}'.format(value))
 				if value == 'NOM':
 					position['settled_units'] = holding_quantity
+				elif value == 'ENT':	# the position is going to be called
+					position['settled_units'] = holding_quantity
+					position['pending_call'] = holding_quantity
 				elif value == 'PENDING DELIVERY':
 					position['pending_delivery'] = position['pending_delivery'] + holding_quantity
 				elif value == 'PENDING RECEIPT':
@@ -511,7 +515,7 @@ def validate_position(position):
 		position['pending_receipt'] - position['sub_total']
 
 	y = position['settled_units'] - position['pending_delivery'] - \
-		position['available_balance']
+		position['pending_call'] - position['available_balance']
 
 	if position['quantity_type'] == 'FAMT':
 		z = position['sub_total']*position['market_price']/100 - position['market_value']
@@ -798,10 +802,10 @@ def write_holding_csv(port_values, directory, file_prefix):
 
 		fields = ['market_code', 'market_name', 'security_name', 
 					'quantity_type', 'settled_units', 'pending_receipt', 
-					'pending_delivery','sub_total', 'available_balance', 
-					'market_price_currency', 'market_price', 'market_value', 
-					'exchange_currency_pair', 'exchange_rate', 'equivalent_currency', 
-					'equivalent_market_value']
+					'pending_delivery', 'pending_call', 'sub_total', 
+					'available_balance', 'market_price_currency', 
+					'market_price', 'market_value', 'exchange_currency_pair', 
+					'exchange_rate', 'equivalent_currency', 'equivalent_market_value']
 
 		file_writer.writerow(['portfolio', 'custodian_account', 'geneva_investment_id',
 								'isin', 'bloomberg_figi', 'date'] + fields)

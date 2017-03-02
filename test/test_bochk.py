@@ -115,7 +115,12 @@ class TestBOCHK(unittest2.TestCase):
         initialize_position(position)
         read_position_holding_detail(ws, 3, fields, position)
 
-        self.assertEqual(len(position), 13)
+        # for fld in position:
+        #     print('{0}: {1}'.format(fld, position[fld]))
+        # import sys
+        # sys.exit(1)
+
+        self.assertEqual(len(position), 14)
         self.assertEqual(position['generation_date'], datetime(2016,11,16))
         self.assertEqual(position['statement_date'], datetime(2016,11,16))
         self.assertEqual(position['security_id_type'], 'ISIN')
@@ -133,7 +138,7 @@ class TestBOCHK(unittest2.TestCase):
         read_position_holding_detail(ws, 20, fields, position)
         read_position_holding_detail(ws, 21, fields, position)
 
-        self.assertEqual(len(position), 13)
+        self.assertEqual(len(position), 14)
         self.assertEqual(position['generation_date'], datetime(2016,7,12))
         self.assertEqual(position['statement_date'], datetime(2016,7,11))
         self.assertEqual(position['security_id_type'], 'ISIN')
@@ -152,7 +157,7 @@ class TestBOCHK(unittest2.TestCase):
         initialize_position(position)
         read_position_holding_detail(ws, 3, fields, position)
         read_position_sub_total(ws, 4, fields, position)
-        self.assertEqual(len(position), 21)
+        self.assertEqual(len(position), 22)
         self.assertEqual(position['sub_total'], 7200000)
         self.assertEqual(position['market_price_currency'], 'USD')
         self.assertAlmostEqual(position['market_price'], 96.966)
@@ -169,7 +174,7 @@ class TestBOCHK(unittest2.TestCase):
         initialize_position(position)
         read_position_holding_detail(ws, 600, fields, position)
         read_position_sub_total(ws, 601, fields, position)
-        self.assertEqual(len(position), 17)
+        self.assertEqual(len(position), 18)
         self.assertEqual(position['sub_total'], 2000000)
         self.assertEqual(position['market_price_currency'], 'USD')
         self.assertAlmostEqual(position['market_price'], 97.4179)
@@ -200,6 +205,24 @@ class TestBOCHK(unittest2.TestCase):
         self.assertEqual(row, 25)
 
         self.validate_position_fields(position)
+
+
+
+    def test_read_position2(self):
+        # test the bond call
+        ws = self.get_worksheet('\\samples\\sample_holdings5_call.xls')
+        fields = read_holdings_fields(ws, 2)
+
+        # read the call position
+        position = {}
+        row = read_position(ws, 12, fields, position)
+        self.assertEqual(row, 15)
+        self.assertEqual(position['settled_units'], 250000)
+        self.assertEqual(position['pending_call'], 250000)
+        self.assertEqual(position['sub_total'], 250000)
+        self.assertEqual(position['pending_delivery'], 0)
+        self.assertEqual(position['pending_receipt'], 0)
+        self.assertEqual(position['available_balance'], 0)
 
 
 
@@ -243,7 +266,14 @@ class TestBOCHK(unittest2.TestCase):
         try:
             x = read_holdings(ws, 3, port_values, fields)
             self.assertTrue(x is None)
-            self.verify_holdings(port_values['holdings'])
+            # self.verify_holdings(port_values['holdings'])
+            holdings = port_values['holdings']
+            self.assertEqual(len(holdings), 27)
+            self.validate_position1(holdings[0])
+            self.validate_position2(holdings[17])
+            self.validate_position3(holdings[26])
+
+
         except:
             self.fail('read_holdings() failed')
 
@@ -340,7 +370,7 @@ class TestBOCHK(unittest2.TestCase):
                     'market_price', 'market_value', 'exchange_currency_pair',
                     'exchange_rate', 'equivalent_currency',
                     'equivalent_market_value', 'settled_units', 'pending_receipt',
-                    'pending_delivery', 'sub_total', 'available_balance']
+                    'pending_delivery', 'sub_total', 'pending_call', 'available_balance']
 
         self.assertEqual(len(position), len(fields))
         for fld in position.keys():
@@ -357,8 +387,8 @@ class TestBOCHK(unittest2.TestCase):
                     'security_id_type', 'security_id', 'security_name',
                     'quantity_type', 'market_price_currency',
                     'market_price', 'market_value', 'settled_units', 
-                    'pending_receipt', 'pending_delivery', 'sub_total', 
-                    'available_balance']
+                    'pending_receipt', 'pending_delivery', 'pending_call', 
+                    'sub_total', 'available_balance']
         self.assertEqual(len(position), len(fields))
         for fld in position.keys():
             self.assertTrue(fld in fields)

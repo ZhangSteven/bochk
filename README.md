@@ -26,6 +26,14 @@ Todo
 
 
 ++++++++++
+ver 0.26
+++++++++++
+1. Added support for bond call. When bond call is announced, the holding type is 'ENT', meaning the bond is still available for sell, so sub total won't change, but available balance drops.
+
+
+
+
+++++++++++
 ver 0.25
 ++++++++++
 1. The config file is changed to add an option allowing the validate_position() function to ignore certain bonds, because they allow principle paydown so they won't satisfy the validation checks and they need to be ignored for the check.
