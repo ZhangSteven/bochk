@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.27
+++++++++++
+1. Add mapping from fund name to portfolio code (both cash and position), for special event fund.
+
+
+
+++++++++++
 ver 0.26
 ++++++++++
 1. Added support for bond call. When bond call is announced, the holding type is 'ENT', meaning the bond is still available for sell, so sub total won't change, but available balance drops.
