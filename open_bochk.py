@@ -804,10 +804,10 @@ def write_holding_csv(port_values, directory, file_prefix):
 
 		fields = ['market_code', 'market_name', 'security_name', 
 					'quantity_type', 'settled_units', 'pending_receipt', 
-					'pending_delivery', 'pending_call', 'sub_total', 
-					'available_balance', 'market_price_currency', 
-					'market_price', 'market_value', 'exchange_currency_pair', 
-					'exchange_rate', 'equivalent_currency', 'equivalent_market_value']
+					'pending_delivery', 'sub_total', 'available_balance', 
+					'market_price_currency', 'market_price', 'market_value', 
+					'exchange_currency_pair', 'exchange_rate', 
+					'equivalent_currency', 'equivalent_market_value', 'pending_call']
 
 		file_writer.writerow(['portfolio', 'custodian_account', 'geneva_investment_id',
 								'isin', 'bloomberg_figi', 'date'] + fields)

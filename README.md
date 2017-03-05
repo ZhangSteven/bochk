@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.28
+++++++++++
+1. Move the new column added in ver 0.26 to the last column, because it was inserted in between other columns and that caused the custom loader in Geneva to load wrong data, because that loader map column number to data.
+
+
+
+++++++++++
 ver 0.27
 ++++++++++
 1. Add mapping from fund name to portfolio code (both cash and position), for special event fund.
