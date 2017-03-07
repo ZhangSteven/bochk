@@ -84,12 +84,12 @@ class TestBOCHKError(unittest2.TestCase):
             read_holdings_bochk(filename, port_values)
 
 
-
-    def test_err7(self):
-        filename = get_current_path() + '\\samples\\sample_holdings_error7 _ 16112016.xls'
-        port_values = {}
-        with self.assertRaises(InconsistentPosition):
-            read_holdings_bochk(filename, port_values)
+    # This test case is 
+    # def test_err7(self):
+    #     filename = get_current_path() + '\\samples\\sample_holdings_error7 _ 16112016.xls'
+    #     port_values = {}
+    #     with self.assertRaises(InconsistentPosition):
+    #         read_holdings_bochk(filename, port_values)
 
 
 

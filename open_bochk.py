@@ -514,8 +514,8 @@ def validate_position(position):
 	x = position['settled_units'] - position['pending_delivery'] + \
 		position['pending_receipt'] - position['sub_total']
 
-	y = position['settled_units'] - position['pending_delivery'] - \
-		position['pending_call'] - position['available_balance']
+	# y = position['settled_units'] - position['pending_delivery'] - \
+	# 	position['pending_call'] - position['available_balance']
 
 	if position['quantity_type'] == 'FAMT':
 		z = position['sub_total']*position['market_price']/100 - position['market_value']
@@ -528,11 +528,12 @@ def validate_position(position):
 		z2 = 0
 
 	if position['sub_total'] < 0:	# for short positions, available balance = 0
-		y = 0						# market value of position is also 0.
+		# y = 0						# market value of position is also 0.
 		z = 0
 		z2 = 0
 
-	if x==0 and y==0 and abs(z) < 0.01 and abs(z2) < 0.01:
+	# if x==0 and y==0 and abs(z) < 0.01 and abs(z2) < 0.01:
+	if x==0 and abs(z) < 0.01 and abs(z2) < 0.01:
 		pass
 	elif position['security_id_type']+':'+position['security_id'] in get_exception_list():
 		# if it is a bond (ABS etc.) that allows capital paydown so that market
