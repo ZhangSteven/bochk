@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.29
+++++++++++
+1. When there is a short position, position sub total is negative, but available balance is zero. This fails the validation. The code is modified to suit this case.
+
+
+
+++++++++++
 ver 0.28
 ++++++++++
 1. Move the new column added in ver 0.26 to the last column, because it was inserted in between other columns and that caused the custom loader in Geneva to load wrong data, because that loader map column number to data.

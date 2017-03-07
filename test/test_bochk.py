@@ -308,6 +308,16 @@ class TestBOCHK(unittest2.TestCase):
 
 
 
+    def test_read_holdings_bochk3(self):
+        filename = get_current_path() + '\\samples\\short_position _ 03032017.xlsx'
+        port_values = {}
+        read_holdings_bochk(filename, port_values)
+        self.assertEqual(port_values['holdings'][0]['sub_total'], -200000)
+        self.assertEqual(port_values['holdings'][1]['sub_total'], -1600000)
+
+
+
+
     # def test_populate_investment_ids(self):
     #     lookup_file = '\\samples\\sample_investmentLookup.xls'
     #     initialize_investment_lookup(lookup_file)
