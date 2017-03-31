@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.30
+++++++++++
+1. The read_grand_total() function is modified, previously it reads grand total from column 20, but we find that some times it is not there. The function now searches for the value on that row.
+
+
+
+++++++++++
 ver 0.29
 ++++++++++
 1. When there is a short position, position sub total is negative, but available balance is zero. This fails the validation. The code is modified to suit this case.

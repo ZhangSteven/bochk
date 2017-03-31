@@ -11,7 +11,8 @@ from bochk.open_bochk import read_holdings_bochk, InvalidFieldName, InvalidHoldi
                                 InconsistentPositionGrandTotal, InvalidCashEntry, \
                                 InvalidCashTransaction, read_cash_bochk, read_holdings_bochk, \
                                 write_holding_csv, write_csv, UnhandledPosition, \
-                                InvalidCashAccountName, get_prefix_from_dir
+                                InvalidCashAccountName, get_prefix_from_dir, GrandTotalNotFound, \
+                                read_grand_total, read_holdings_fields, is_grand_total
 from investment_lookup.id_lookup import InvestmentIdNotFound
 
 
@@ -35,6 +36,15 @@ class TestBOCHKError(unittest2.TestCase):
             Run after a test finishes
         """
         pass
+
+
+
+    def get_worksheet(self, filename):
+        filename = get_current_path() + filename
+        wb = open_workbook(filename=filename)
+        ws = wb.sheet_by_index(0)
+        return ws
+
 
 
     def test_err(self):
@@ -114,6 +124,16 @@ class TestBOCHKError(unittest2.TestCase):
         port_values = {}
         with self.assertRaises(InconsistentPositionGrandTotal):
             read_holdings_bochk(filename, port_values)
+
+
+
+    def test_grand_total_error(self):
+        ws = self.get_worksheet('\\samples\\sample_holdings_error12 _ 10072016.xls')
+        fields = read_holdings_fields(ws, 2)
+
+        self.assertTrue(is_grand_total(ws, 93))
+        with self.assertRaises(GrandTotalNotFound):
+            x = read_grand_total(ws, 93)
 
 
 

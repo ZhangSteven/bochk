@@ -253,7 +253,20 @@ class TestBOCHK(unittest2.TestCase):
         self.assertTrue(is_grand_total(ws, 93))
         try:
             x = read_grand_total(ws, 93)
-            self.assertTrue(x > 0)
+            self.assertEqual(x, 48415234)
+        except:
+            self.fail('read grand total failed')
+
+
+
+    def test_grand_total2(self):
+        ws = self.get_worksheet('\\samples\\sample_holdings6 _ 30032017.xlsx')
+        fields = read_holdings_fields(ws, 2)
+
+        self.assertTrue(is_grand_total(ws, 279))
+        try:
+            x = read_grand_total(ws, 279)
+            self.assertAlmostEqual(x, 459087628.2)
         except:
             self.fail('read grand total failed')
 

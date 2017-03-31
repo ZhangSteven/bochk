@@ -56,6 +56,10 @@ class InconsistentPositionGrandTotal(Exception):
 class FileHandlerNotFound(Exception):
 	pass
 
+class GrandTotalNotFound(Exception):
+	pass
+
+
 
 
 def read_file(filename, port_values):
@@ -557,12 +561,26 @@ def is_grand_total(ws, row):
 
 
 def read_grand_total(ws, row):
-	cell_value = ws.cell_value(row, 20)
-	if isinstance(cell_value, float):
-		return cell_value
-	else:
-		logger.error('read_grand_total(): grand total is not of type float, at row {0}, column 20'.format(row))
-		raise TypeError
+	# cell_value = ws.cell_value(row, 20)
+	# if isinstance(cell_value, float):
+	# 	return cell_value
+	# else:
+	# 	logger.error('read_grand_total(): grand total is not of type float, at row {0}, column 20'.format(row))
+	# 	raise TypeError
+
+	for i in range(1, ws.ncols):
+		cell_value = ws.cell_value(row, i)
+		if isinstance(cell_value, str) and cell_value.strip().lower() in ['hkd', 'usd']:
+
+			if isinstance(ws.cell_value(row, i+1), float):
+				return ws.cell_value(row, i+1)
+			else:
+				logger.error('read_grand_total(): grand total {0} should be float, at row {1} column {2}'.
+								format(ws.cell_value(row, i+1), row, i+1))
+				raise TypeError
+
+	logger.error('read_grand_total(): grand total not found')
+	raise GrandTotalNotFound()
 
 
 
@@ -663,6 +681,7 @@ def map_cash_to_portfolio_id(cash_account_name):
 		'CLT-CHINA LIFE FRANKLIN CLIENTS ACCOUNT':'13456',
 		'MAPLES TRUSTEE SERV (CY) LTD-CHINA LIFE FRANKLIN TT-GREEN BLUE SP OP F':'11602',
 		'MAPLES TRUSTEE SERVICE(CY)LTD-CHINA LIFE FRANKLIN TT-SPECIAL EVENT FD':'16454',
+		'MAPLES TRUSTEE SERV(CY) LTD - CHINA LIFE FRANKLIN TT - FFX INVESTMENTS':'30001',
 
 		# the cash of 11490 in BOCHK
 		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND':'11490'
@@ -692,7 +711,8 @@ def map_holding_to_portfolio_id(holding_account_name):
 		'CLT-CLI HK BR(CLS A-HK)TRUST FD(SUB-FD-TRADING BD)':'12528',
 		'CLT-CHINA LIFE FRANKLIN CLIENTS ACCOUNT':'13456',
 		'MAPLES T SER(CY)LTD-CL FRANK TT-GREEN BLUE SP OP F':'11602',
-		'MAPLES TRUSTEE SERV (CY) LTD-CHINA L F TT-S E FD':'16454'
+		'MAPLES TRUSTEE SERV (CY) LTD-CHINA L F TT-S E FD':'16454',
+		'MAPLES TRUSTEE SERV(CY) LTD-CHINA L F TT-FFX INV':'30001'
 	}
 
 	try:
