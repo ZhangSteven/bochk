@@ -368,7 +368,13 @@ def read_holdings(ws, row, port_values, fields):
 
 		position = {}
 		row = read_position(ws, row, fields, position)
-		validate_position(position)
+
+		# Do not validation positions as occasionally BOCHK makes
+		# mistakes in market value computation, e.g., in the 2017-5-5
+		# FFX holdings file, first position, the market value should
+		# be divided by 100.
+		# validate_position(position)
+
 		holdings.append(position)
 
 	# end of while loop

@@ -26,6 +26,13 @@ Todo
 
 
 ++++++++++
+ver 0.301
+++++++++++
+1. The validate_position() function is no longer called in read_holdings() function, because BOCHK occasionally makes mistakes in market value computation. For example, FFX fund, 2017-5-5 holdings file, fist position. This is not considerred an upgrade of the program, rather, a comproise to make it work. Therefore the version number 0.301.
+
+
+
+++++++++++
 ver 0.30
 ++++++++++
 1. The read_grand_total() function is modified, previously it reads grand total from column 20, but we find that some times it is not there. The function now searches for the value on that row.
