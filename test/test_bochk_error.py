@@ -106,7 +106,7 @@ class TestBOCHKError(unittest2.TestCase):
     def test_err8(self):
         filename = get_current_path() + '\\samples\\sample_holdings_error8 _ 16112016.xls'
         port_values = {}
-        with self.assertRaises(InconsistentPosition):
+        with self.assertRaises(InconsistentPositionGrandTotal):
             read_holdings_bochk(filename, port_values)
 
 

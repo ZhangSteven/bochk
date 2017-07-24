@@ -17,11 +17,11 @@ Note
 4. When a position's security id type is not ISIN, the program then looks up the isin code or BBG ID in investmentLookup.xls file. Currently there are 2 such bonds (based on 2016-7-6 broker statement), when more such bonds appear, update this file.
 
 
-++++++++++
-Todo
-++++++++++
 
-1. Validate a position's holding quantity after each position read.
+++++++++++
+ver 0.302
+++++++++++
+1. Since validate_position() function is no longer called, then error testing code also updated to reflect that change. test_bochk_error.py, test_err8()
 
 
 
