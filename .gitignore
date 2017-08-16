@@ -3,6 +3,7 @@ __pycache__/
 
 # ignore the log file
 bochk.log
+bochk.log.*
 
 # ignore the result file
 samples/*.csv

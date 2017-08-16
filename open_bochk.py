@@ -8,9 +8,11 @@ from xlrd import open_workbook
 from xlrd.xldate import xldate_as_datetime
 import csv, argparse, os, sys, re
 from datetime import datetime
-from bochk.utility import logger, get_datemode, get_current_path, \
+from bochk.utility import get_datemode, get_current_path, \
 							get_input_directory, get_exception_list
 from investment_lookup.id_lookup import get_investment_Ids
+import logging
+logger = logging.getLogger(__name__)
 
 
 
@@ -889,6 +891,9 @@ if __name__ == '__main__':
 	an error, but the output of the latter will override the output csv
 	of the former.
 	"""
+	import logging.config
+	logging.config.fileConfig('logging.config', disable_existing_loggers=False)
+	
 	parser = argparse.ArgumentParser(description='Read cash and position files from BOC HK, then convert to Geneva format for reconciliation purpose. Check the config file for path to those files.')
 	parser.add_argument('files', metavar='files', type=str, nargs='+',
 						help='cash and/or holdings files')

@@ -17,6 +17,13 @@ Note
 4. When a position's security id type is not ISIN, the program then looks up the isin code or BBG ID in investmentLookup.xls file. Currently there are 2 such bonds (based on 2016-7-6 broker statement), when more such bonds appear, update this file.
 
 
+++++++++++
+ver 0.31@2017-8-16
+++++++++++
+1. Updated logging, now all modules use the standard way to obtain a logger:
+	logger = logging.getLogger(__name__)
+
+
 
 ++++++++++
 ver 0.302
