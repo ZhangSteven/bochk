@@ -197,6 +197,7 @@ def read_holdings_fields(ws, row):
 		'Quantity Type':'quantity_type',
 		'Holding':'holding_quantity',
 		'Mnemonic Name':'holding_type',	
+		'Registration Name':'holding_type',	# the in house fund
 		'Market Price Currency':'market_price_currency',
 		'Market Unit Price':'market_price',
 		'Market Value':'market_value',
@@ -400,7 +401,7 @@ def read_position(ws, row, fields, position):
 	while row < ws.nrows:
 		if record_type == 'Holding Details':
 			read_position_holding_detail(ws, row, fields, position)
-		elif record_type == 'Sub-Total':
+		elif record_type == 'Sub-Total' or record_type == 'Sub-Total Per Instrument of Custody A/C':
 			read_position_sub_total(ws, row, fields, position)
 		elif record_type == 'Available Balance':
 			read_position_available_balance(ws, row, fields, position)
@@ -432,6 +433,7 @@ def read_position_holding_detail(ws, row, fields, position):
 	for fld in fields:
 		cell_value = ws.cell_value(row, i)
 		if fld == 'generation_date' or fld == 'statement_date':
+			# print(cell_value)
 			position[fld] = xldate_as_datetime(cell_value, get_datemode())
 		elif fld == 'holding_quantity':
 			if isinstance(cell_value, float):
@@ -629,7 +631,10 @@ def validate_all_holdings(holdings, grand_total):
 
 	if not grand_total is None:
 		grand_total_position = accumulate_position_total(holdings)
-		if abs(grand_total_position - grand_total) > 0.01:
+		if abs(grand_total_position - grand_total) > 0.5:	# the in house fund seems to
+															# keep one decimal point only,
+															# therefore we use 0.5 as the
+															# threshoold
 			logger.error('validate_all_holdings(): inconsistent grand total: position total={0}, grand total={1}'.
 							format(grand_total_position, grand_total))
 			raise InconsistentPositionGrandTotal()
@@ -692,7 +697,10 @@ def map_cash_to_portfolio_id(cash_account_name):
 		'MAPLES TRUSTEE SERV(CY) LTD - CHINA LIFE FRANKLIN TT - FFX INVESTMENTS':'30001',
 
 		# the cash of 11490 in BOCHK
-		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND':'11490'
+		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND':'11490',
+
+		# the in house fund
+		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051'
 	}
 
 	try:
@@ -720,7 +728,10 @@ def map_holding_to_portfolio_id(holding_account_name):
 		'CLT-CHINA LIFE FRANKLIN CLIENTS ACCOUNT':'13456',
 		'MAPLES T SER(CY)LTD-CL FRANK TT-GREEN BLUE SP OP F':'11602',
 		'MAPLES TRUSTEE SERV (CY) LTD-CHINA L F TT-S E FD':'16454',
-		'MAPLES TRUSTEE SERV(CY) LTD-CHINA L F TT-FFX INV':'30001'
+		'MAPLES TRUSTEE SERV(CY) LTD-CHINA L F TT-FFX INV':'30001',
+
+		# the in house fund
+		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051'
 	}
 
 	try:
