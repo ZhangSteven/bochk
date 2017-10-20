@@ -17,6 +17,15 @@ Note
 4. When a position's security id type is not ISIN, the program then looks up the isin code or BBG ID in investmentLookup.xls file. Currently there are 2 such bonds (based on 2016-7-6 broker statement), when more such bonds appear, update this file.
 
 
+
+++++++++++
+ver 0.32@2017-10-20
+++++++++++
+1. Added support for in house fund, also from BOCHK.
+2. In house fund has a slight different column name "Registration Name" in holdings excel, and multiple cash accounts of the same currency in cash excel. Therefore cash consolidation and testing code are updated, two more samples are added, too.
+
+
+
 ++++++++++
 ver 0.31@2017-8-16
 ++++++++++

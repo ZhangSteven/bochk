@@ -45,6 +45,7 @@ class TestBOCHK(unittest2.TestCase):
 
 
     def test_retrieve_date_from_filename(self):
+        # test filename only, no need the actual file
         filename = 'C:\\Users\\steven.zhang\\Desktop\\data conversion\\Overseas Bond\\Holding _ 15112016.xls'
         d = retrieve_date_from_filename(filename)
         self.assertEqual(d, datetime(2016,11,15))
@@ -327,6 +328,19 @@ class TestBOCHK(unittest2.TestCase):
         read_holdings_bochk(filename, port_values)
         self.assertEqual(port_values['holdings'][0]['sub_total'], -200000)
         self.assertEqual(port_values['holdings'][1]['sub_total'], -1600000)
+
+
+
+    def test_read_holdings_bochk4(self):
+        # the in house fund holdings
+        filename = get_current_path() + '\\samples\\Holding _ 31082017.xls'
+        port_values = {}
+        read_holdings_bochk(filename, port_values)
+        self.assertEqual(port_values['holdings'][0]['sub_total'], 1000000)
+
+        # the last position
+        self.assertEqual(port_values['holdings'][10]['security_id'], 'XS1450332256')
+        self.assertEqual(port_values['holdings'][10]['sub_total'], 5000000)
 
 
 

@@ -782,7 +782,7 @@ def write_cash_or_holding_csv(port_values, directory=get_input_directory(),
 	Write cash or holdings into csv files.
 	"""
 	output_file = write_cash_csv(port_values, directory, file_prefix)
-	if output_file is None:
+	if output_file is None:	# it's a holding file instead of cash file
 		output_file = write_holding_csv(port_values, directory, file_prefix)
 
 	return output_file
@@ -799,6 +799,53 @@ def write_csv(port_values, directory=get_input_directory(),
 
 
 
+def consolidate_cash(port_values):
+	"""
+	For the balanced fund or guarantee fund, combine the checking
+	and savings account for the same currency in the same bank.
+	"""
+	new_cash_accounts = []
+	cash_accounts = port_values['cash']
+	for cash_account in cash_accounts:
+		if find_n_merge(cash_account, new_cash_accounts):
+			continue
+
+		new_cash_accounts.append(cash_account)
+
+	port_values['cash'] = new_cash_accounts
+
+	
+
+def find_n_merge(cash_account, cash_accounts):
+	"""
+	For the input cash account, if another cash account with the same
+	bank and currency is found in cash accounts, then merge it to
+	the existing cash account, then return true. If not, do nothing,
+	reture false.
+	"""
+	for ca in cash_accounts:
+		if cash_account['Currency'] == ca['Currency']:
+			try:
+				ca['Current Ledger Balance'] = ca['Current Ledger Balance'] + cash_account['Current Ledger Balance']
+			except KeyError:
+				pass
+		
+			try:
+				ca['Current Available Balance'] = ca['Current Available Balance'] + cash_account['Current Available Balance']
+			except KeyError:
+				pass
+
+			try:
+				ca['Ledger Balance'] = ca['Ledger Balance'] + cash_account['Ledger Balance']
+			except KeyError:
+				pass
+
+			return True
+
+	return False
+
+
+
 def write_cash_csv(port_values, directory, file_prefix):
 	if not 'cash' in port_values:	# do nothing
 		logger.warning('write_cash_csv(): no cash information is found.')
@@ -812,6 +859,7 @@ def write_cash_csv(port_values, directory, file_prefix):
 		fields = ['Account Number', 'Currency', 'Balance', 'Current Available Balance']
 		file_writer.writerow(['Portfolio', 'Date', 'Custodian'] + fields)
 
+		consolidate_cash(port_values)
 		for entry in port_values['cash']:
 			# portfolio_date = get_cash_date_as_string(port_values, entry)
 			cash_date = convert_datetime_to_string(port_values['cash_date'])

@@ -7,7 +7,7 @@ from datetime import datetime
 from xlrd import open_workbook
 from bochk.utility import get_current_path
 from bochk.open_bochk import read_cash_fields, read_cash_line, read_cash_bochk, \
-                                read_holdings_bochk
+                                read_holdings_bochk, consolidate_cash
 
 
 
@@ -132,6 +132,17 @@ class TestBOCHKCash(unittest2.TestCase):
 
 
 
+    def test_read_cash_bochk3(self):
+        # the in house fund, it has cash consoliation (two HKD accounts, savings
+        # and current account)
+        filename = get_current_path() + '\\samples\\Cash _ 31082017.xlsx'
+        port_values = {}
+        read_cash_bochk(filename, port_values)
+        consolidate_cash(port_values)
+        self.verify_cash3(port_values['cash'], port_values['cash_transactions'])
+
+
+
     def verify_cash1(self, cash_entries, cash_transactions):
         """
         For sample_cash1 _ 16112016.xls
@@ -158,6 +169,26 @@ class TestBOCHKCash(unittest2.TestCase):
                 self.verify_cash_entry1(entry)
             elif entry['Currency'] == 'USD':
                 self.verify_cash_entry2(entry)
+
+        self.assertEqual(len(cash_transactions), 0)
+
+
+
+    def verify_cash3(self, cash_entries, cash_transactions):
+        """
+        For samples/Cash _ 31082017.xlsx
+        """
+        self.assertEqual(len(cash_entries), 3)
+        for entry in cash_entries:
+            if entry['Currency'] == 'HKD':
+                self.assertAlmostEqual(entry['Current Ledger Balance'], 253456.32)
+                self.assertAlmostEqual(entry['Current Available Balance'], 253456.32)
+                self.assertFalse('Ledger Balance' in entry)
+
+            elif entry['Currency'] == 'USD':
+                self.assertAlmostEqual(entry['Current Ledger Balance'], 284041.93)
+                self.assertAlmostEqual(entry['Current Available Balance'], 284041.93)
+                self.assertFalse('Ledger Balance' in entry)
 
         self.assertEqual(len(cash_transactions), 0)
 
