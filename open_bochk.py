@@ -801,8 +801,8 @@ def write_csv(port_values, directory=get_input_directory(),
 
 def consolidate_cash(port_values):
 	"""
-	For the balanced fund or guarantee fund, combine the checking
-	and savings account for the same currency in the same bank.
+	Combine the checking and savings account for the same currency in
+	the same bank.
 	"""
 	new_cash_accounts = []
 	cash_accounts = port_values['cash']
@@ -818,13 +818,13 @@ def consolidate_cash(port_values):
 
 def find_n_merge(cash_account, cash_accounts):
 	"""
-	For the input cash account, if another cash account with the same
-	bank and currency is found in cash accounts, then merge it to
-	the existing cash account, then return true. If not, do nothing,
-	reture false.
+	find accounts under the same fund, with the same currency, e.g., savings
+	account and current account of the same currency, merge them into one.
 	"""
 	for ca in cash_accounts:
-		if cash_account['Currency'] == ca['Currency']:
+		if cash_account['Currency'] == ca['Currency'] and \
+			cash_account['Account Name'] == ca['Account Name']:
+
 			try:
 				ca['Current Ledger Balance'] = ca['Current Ledger Balance'] + cash_account['Current Ledger Balance']
 			except KeyError:

@@ -19,6 +19,13 @@ Note
 
 
 ++++++++++
+ver 0.33@2017-10-24
+++++++++++
+1. Fixed bug in find_n_merge() in open_bochk.py, where it combines accounts from different fund of the same currency into one account. Now it only combines accounts from the same fund, of the same currency, into one account.
+
+
+
+++++++++++
 ver 0.32@2017-10-20
 ++++++++++
 1. Added support for in house fund, also from BOCHK.
