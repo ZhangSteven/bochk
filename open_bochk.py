@@ -731,7 +731,10 @@ def map_holding_to_portfolio_id(holding_account_name):
 		'MAPLES TRUSTEE SERV(CY) LTD-CHINA L F TT-FFX INV':'30001',
 
 		# the in house fund
-		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051'
+		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051',
+
+		# the new fund from China Life Macau
+		'CLT-CLI MACAU BR(CLS G-MC)TRUST FD (SUB-FUND-BOND)':'99999'
 	}
 
 	try:
