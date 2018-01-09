@@ -705,7 +705,10 @@ def map_cash_to_portfolio_id(cash_account_name):
 		'CLT-CLI MACAU BR (CLASS A-MC) TRUST FUND (SUB-FUND-BOND)':'12366',
 		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FUND (BOND)':'12366',
 
+		# old and new names for 12528
 		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND (SUB-FUND-TRADING BOND)':'12528',
+		'CLT - CLI HK BR (CLASS A-HK) TRUST FUND':'12528',
+
 		'CLT-CHINA LIFE FRANKLIN CLIENTS ACCOUNT':'13456',
 		'MAPLES TRUSTEE SERV (CY) LTD-CHINA LIFE FRANKLIN TT-GREEN BLUE SP OP F':'11602',
 		'MAPLES TRUSTEE SERVICE(CY)LTD-CHINA LIFE FRANKLIN TT-SPECIAL EVENT FD':'16454',
@@ -713,7 +716,6 @@ def map_cash_to_portfolio_id(cash_account_name):
 
 		# the cash of 11490 in BOCHK, old and new names
 		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND':'11490',
-		# 'CLT - CLI HK BR (CLASS A-HK) TRUST FUND':'11490', NOT used
 		'CLT-CLI HK BR (Class A-HK) - Par TRUST FUND':'11490',
 
 		# the in house fund
