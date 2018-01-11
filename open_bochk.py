@@ -766,8 +766,10 @@ def map_holding_to_portfolio_id(holding_account_name):
 		# the in house fund
 		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051',
 
-		# the new fund from China Life Macau
-		'CLT-CLI MACAU BR(CLS G-MC)TRUST FD (SUB-FUND-BOND)':'99999'
+		# the new fund from China Life Macau (temporary port code)
+		'CLT-CLI MACAU BR(CLS G-MC)TRUST FD (SUB-FUND-BOND)':'99999',
+
+		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FD (BD)-PAR':'12549'
 	}
 
 	try:
