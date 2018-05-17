@@ -143,6 +143,17 @@ class TestBOCHKCash(unittest2.TestCase):
 
 
 
+    def test_read_cash_bochk4(self):
+        # the in house fund, it has cash consoliation (two HKD accounts, savings
+        # and current account)
+        filename = get_current_path() + '\\samples\\Cash Stt _30042018.xlsx'
+        port_values = {}
+        read_cash_bochk(filename, port_values)
+        consolidate_cash(port_values)
+        self.verify_cash4(port_values['cash'], port_values['cash_transactions'])
+
+
+
     def verify_cash1(self, cash_entries, cash_transactions):
         """
         For sample_cash1 _ 16112016.xls
@@ -191,6 +202,28 @@ class TestBOCHKCash(unittest2.TestCase):
                 self.assertFalse('Ledger Balance' in entry)
 
         self.assertEqual(len(cash_transactions), 0)
+
+
+
+
+    def verify_cash4(self, cash_entries, cash_transactions):
+        """
+        For samples/Cash Stt _30042018.xlsx, where there is a multi currency
+        cash account whose currency field is empty.
+        """
+        self.assertEqual(len(cash_entries), 3)
+        for entry in cash_entries:
+            if entry['Currency'] == 'HKD':
+                self.assertAlmostEqual(entry['Current Ledger Balance'], 0)
+                self.assertAlmostEqual(entry['Current Available Balance'], 0)
+                self.assertFalse('Ledger Balance' in entry)
+
+            elif entry['Currency'] == 'USD':
+                self.assertAlmostEqual(entry['Ledger Balance'], 38945475.97)
+                self.assertAlmostEqual(entry['Current Available Balance'], 7495695.57)
+                self.assertTrue('Current Ledger Balance' in entry)
+
+        self.assertEqual(len(cash_transactions), 2)
 
 
 

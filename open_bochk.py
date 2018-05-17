@@ -289,7 +289,8 @@ def read_cash_line(ws, row, fields):
 	for fld in fields:
 		cell_value = ws.cell_value(row, column)
 		if fld in ['Account Name', 'Account Number', 'Account Type', 'Currency']:
-			if isinstance(cell_value, str) and cell_value.strip() != '':
+			# if isinstance(cell_value, str) and cell_value.strip() != '':
+			if isinstance(cell_value, str):	
 				cash_entry[fld] = cell_value.strip()
 			else:
 				logger.error('read_cash_line(): invalid cash entry at row {0}, column {1}, value={2}'.
@@ -721,7 +722,10 @@ def map_cash_to_portfolio_id(cash_account_name):
 		'CLT-CLI HK BR (Class A-HK) - Par TRUST FUND':'11490',
 
 		# the in house fund
-		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051'
+		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051',
+
+		# JIC International
+		'JIC INTERNATIONAL LIMITED - CLFAMC': '40001'
 	}
 
 	try:
@@ -848,6 +852,9 @@ def consolidate_cash(port_values):
 	cash_accounts = port_values['cash']
 	for cash_account in cash_accounts:
 		if find_n_merge(cash_account, new_cash_accounts):
+			continue
+
+		if cash_account['Currency'] == '':
 			continue
 
 		new_cash_accounts.append(cash_account)

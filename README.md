@@ -19,6 +19,13 @@ Note
 
 
 ++++++++++
+ver 0.34@2018-5-17
+++++++++++
+1. Add support for cash statements containing multiple currency savings account whose currency is empty and balance is zero. This type of account is simply ignored.
+
+
+
+++++++++++
 ver 0.33@2017-10-24
 ++++++++++
 1. Fixed bug in find_n_merge() in open_bochk.py, where it combines accounts from different fund of the same currency into one account. Now it only combines accounts from the same fund, of the same currency, into one account.

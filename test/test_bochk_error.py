@@ -137,11 +137,11 @@ class TestBOCHKError(unittest2.TestCase):
 
 
 
-    def test_cash_error1(self):
-        filename = get_current_path() + '\\samples\\cash_error _ 16112016.xls'
-        port_values = {}
-        with self.assertRaises(InvalidCashEntry):
-            read_cash_bochk(filename, port_values)
+    # def test_cash_error1(self):
+    #     filename = get_current_path() + '\\samples\\cash_error _ 16112016.xls'
+    #     port_values = {}
+    #     with self.assertRaises(InvalidCashEntry):
+    #         read_cash_bochk(filename, port_values)
 
 
 
