@@ -725,7 +725,7 @@ def map_cash_to_portfolio_id(cash_account_name):
 		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051',
 
 		# JIC International
-		'JIC INTERNATIONAL LIMITED - CLFAMC': '40001'
+		'JIC INTERNATIONAL LIMITED - CLFAMC': '40002'
 	}
 
 	try:
