@@ -720,6 +720,7 @@ def map_cash_to_portfolio_id(cash_account_name):
 		# the cash of 11490 in BOCHK, old and new names
 		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND':'11490',
 		'CLT-CLI HK BR (Class A-HK) - Par TRUST FUND':'11490',
+		'CLT - CLI HK BR (CLASS A-HK) TRUST FUND - PAR': '11490',
 
 		# the in house fund
 		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051',
