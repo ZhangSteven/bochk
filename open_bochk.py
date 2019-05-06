@@ -773,6 +773,9 @@ def map_holding_to_portfolio_id(holding_account_name):
 		'MAPLES TRUSTEE SERV (CY) LTD-CHINA L F TT-S E FD':'16454',
 		'MAPLES TRUSTEE SERV(CY) LTD-CHINA L F TT-FFX INV':'30001',
 
+		
+		'CLT-CLI MACAU BR (CLASS A-MC) TRUST FUND': '12298',
+
 		# the in house fund
 		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051',
 
