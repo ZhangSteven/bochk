@@ -785,7 +785,10 @@ def map_holding_to_portfolio_id(holding_account_name):
 		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FD (BD)-PAR':'12549',
 
 		# JIC International
-		'JIC INTERNATIONAL LIMITED - CLFAMC': '40002'
+		'JIC INTERNATIONAL LIMITED - CLFAMC': '40002',
+
+		'CLT - CLI HK BR (CLASS A-HK) TRUST FUND - PAR': '11500'
+
 	}
 
 	try:
