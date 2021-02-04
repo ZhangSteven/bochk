@@ -709,6 +709,9 @@ def map_cash_to_portfolio_id(cash_account_name):
 		# account 12298
 		'CLT-CLI MACAU BR (CLASS A-MC) TRUST FUND': '12298',
 
+		# account 13006
+		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FUND - PAR': '13006',
+
 		# old and new names for 12528
 		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND (SUB-FUND-TRADING BOND)':'12528',
 		'CLT - CLI HK BR (CLASS A-HK) TRUST FUND':'12528',
