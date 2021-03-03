@@ -709,6 +709,9 @@ def map_cash_to_portfolio_id(cash_account_name):
 		# account 12298
 		'CLT-CLI MACAU BR (CLASS A-MC) TRUST FUND': '12298',
 
+		# account 13006
+		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FUND - PAR': '13006',
+
 		# old and new names for 12528
 		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND (SUB-FUND-TRADING BOND)':'12528',
 		'CLT - CLI HK BR (CLASS A-HK) TRUST FUND':'12528',
@@ -772,6 +775,8 @@ def map_holding_to_portfolio_id(holding_account_name):
 		# old and new names for 12366
 		'CLT-CLI MACAU BR(CLS A-MC)TRUST FD (SUB-FUND-BOND)':'12366',
 		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FUND (BOND)':'12366',
+
+		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FUND - PAR': '13006',
 
 		'CLT-CLI HK BR(CLS A-HK)TRUST FD(SUB-FD-TRADING BD)':'12528',
 		'CLT-CHINA LIFE FRANKLIN CLIENTS ACCOUNT':'13456',
