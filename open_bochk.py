@@ -713,6 +713,8 @@ def map_cash_to_portfolio_id(cash_account_name):
 		'CLT-CLI HK BR (CLASS A- HK) TRUST FUND (SUB-FUND-TRADING BOND)':'12528',
 		'CLT - CLI HK BR (CLASS A-HK) TRUST FUND':'12528',
 
+		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FUND - PAR': '13006',
+
 		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FUND (BOND) - PAR':'12549',
 
 		'CLT-CHINA LIFE FRANKLIN CLIENTS ACCOUNT':'13456',
@@ -729,7 +731,11 @@ def map_cash_to_portfolio_id(cash_account_name):
 		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051',
 
 		# JIC International
-		'JIC INTERNATIONAL LIMITED - CLFAMC': '40002'
+		'JIC INTERNATIONAL LIMITED - CLFAMC': '40002',
+
+		# FIXME: All client accounts share the same account name,
+		# 
+		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO.': '40004'
 	}
 
 	try:
@@ -776,6 +782,8 @@ def map_holding_to_portfolio_id(holding_account_name):
 		
 		'CLT-CLI MACAU BR (CLASS A-MC) TRUST FUND': '12298',
 
+		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FUND - PAR': '13006',
+
 		# the in house fund
 		'CHINA LIFE FRANKLIN ASSET MANAGEMENT CO LTD':'20051',
 
@@ -785,7 +793,12 @@ def map_holding_to_portfolio_id(holding_account_name):
 		'CLT - CLI MACAU BR (CLASS A-MC) TRUST FD (BD)-PAR':'12549',
 
 		# JIC International
-		'JIC INTERNATIONAL LIMITED - CLFAMC': '40002'
+		'JIC INTERNATIONAL LIMITED - CLFAMC': '40002',
+
+		# Client Account Starberry
+		'CHINA LIFE FRANKLIN ASSET MGT CO LTD-CLIENT A/C 2': '40004',
+
+		'CLT - CLI HK BR (CLASS A-HK) TRUST FUND - PAR': '11500'
 	}
 
 	try:
